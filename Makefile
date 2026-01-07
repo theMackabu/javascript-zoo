@@ -8,3 +8,19 @@ GITHUB_TOKEN := $(shell cat ~/.iac/github-public-token.txt 2>/dev/null || true)
 update:
 	./update.py --format-markdown $(if $(GITHUB_TOKEN),--github="$(GITHUB_TOKEN)")
 	./conformance/results/README-gen.py
+
+install:
+	npm install
+
+app: .PHONY app-build
+
+app-build:
+	npm run app:build
+
+app-dev:
+	npm run app:dev
+
+app-preview:
+	npm run app:preview
+
+.PHONY:

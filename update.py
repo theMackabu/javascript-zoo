@@ -152,7 +152,7 @@ def do_engine_data(args, kind, md_glob, json_file, conformance_data):
     data = {}   # id (engine[_variant]) => row
 
     for filename in sorted(glob.glob(md_glob)):
-        if re.search('README.md', filename):
+        if re.search('README.md', filename) or os.path.basename(filename) == 'index.md':
             continue
 
         if os.isatty(1):
@@ -533,6 +533,7 @@ def process_md(row, kind, filename, args):
     row['title'] = row.get('title', parsed.title)
     row['summary'] = strip_markdown_links(parsed.summary)
     row['jsz_url'] = f'{MARKDOWN_LINKS_BASE}{kind}s/{os.path.basename(filename)}'
+    row['markdown'] = open(filename).read()
 
     for item in parsed.metadata:
         if item.json_key is None or item.detailed_value is None: continue

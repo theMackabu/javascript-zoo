@@ -1,0 +1,84 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+
+:root {
+  color-scheme: light;
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+    'Segoe UI Symbol', 'Noto Color Emoji';
+  --app-header-height: 64px;
+  --bg-primary: #eff1f5;
+  --bg-header: #e6e9ef;
+  --bg-row-odd: #f5f6fa;
+  --bg-row-even: #eff1f5;
+  --bg-muted: #f6f8fa;
+  --bg-thead: #eff1f5;
+  --bg-hover: #ddf4ff;
+  --bg-sorted: color-mix(in srgb, var(--bg-hover) 60%, transparent);
+  --bg-missing: #eeeeee;
+  --bg-control: #ffffff;
+  --border-light: #e5e3e0;
+  --border-medium: #d1cdc7;
+  --border-muted: #d1d9e0b3;
+  --text-accent: #0969da;
+  --text-muted: #333333;
+  --text-numeric: #0550ae;
+  --text-primary: #000000;
+  --text-red: #cf222e;
+}
+
+.dark {
+  color-scheme: dark;
+  --bg-primary: #0d1117;
+  --bg-header: #0d1117;
+  --bg-row-odd: #0d1117;
+  --bg-row-even: #151b23;
+  --bg-muted: #151b23;
+  --bg-thead: #2f3751;
+  --bg-hover: #3d4766;
+  --bg-sorted: color-mix(in srgb, #99b3ff 15%, transparent);
+  --bg-missing: #44475a;
+  --bg-control: #000000;
+  --border-light: #343746;
+  --border-medium: #424450;
+  --border-muted: #3d444db3;
+  --text-accent: #50fa7b;
+  --text-muted: #99b3ff;
+  --text-numeric: #bd93f9;
+  --text-primary: #f8f8f2;
+  --text-red: #ff79c6;
+}
+
+body {
+  margin: 0;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+a {
+  color: var(--text-accent);
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--text-muted) 50%, transparent) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--text-muted) 45%, transparent);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, var(--text-muted) 65%, transparent);
+  background-clip: padding-box;
+}
