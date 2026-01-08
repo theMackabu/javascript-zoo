@@ -97,20 +97,13 @@ onUnmounted(() => {
   <main class="app">
     <header class="app-header">
       <div class="title-row">
-        <a
-          class="app-title-link"
-          href="https://github.com/ivankra/javascript-zoo"
-          target="_blank"
-          rel="noreferrer"
-        >
-          JavaScript engines zoo
-        </a>
+        <span class="app-title-link">JavaScript engines zoo</span>
         <div class="header-actions">
           <EngineTableControls :state="state" :theme="theme" :toggle-theme="toggleTheme" :show-theme="true" />
         </div>
       </div>
     </header>
-    <section class="app-body">
+    <section class="app-body" :class="{ hidden: selectedEngine }">
       <EngineTable :state="state" :show-controls="false" @select-engine="openEngine" />
     </section>
     <MarkdownPreview
@@ -134,13 +127,22 @@ onUnmounted(() => {
   top: 0;
   left: 0;
   right: 0;
+  width: 100%;
+  margin: 0;
+  padding: 0;
   height: var(--app-header-height);
   display: flex;
   align-items: center;
   border-bottom: 1px solid var(--border-light);
   background: var(--bg-header);
   z-index: 10;
+  box-sizing: border-box;
 }
+
+.app-body {
+  padding-top: var(--app-header-height);
+}
+
 
 .title-row {
   display: flex;
@@ -148,6 +150,8 @@ onUnmounted(() => {
   justify-content: flex-start;
   gap: 12px;
   width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
   padding: 0 20px;
 }
 
@@ -173,12 +177,14 @@ onUnmounted(() => {
   text-decoration: none;
 }
 
-.app-title-link:hover {
-  text-decoration: underline;
+.app-body.hidden {
+  display: none;
 }
 
-.app-body {
-  padding-top: var(--app-header-height);
+@media (min-width: 721px) {
+  .app-body.hidden {
+    display: block;
+  }
 }
 
 </style>

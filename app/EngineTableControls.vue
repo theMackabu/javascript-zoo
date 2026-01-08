@@ -34,13 +34,13 @@ const visibleCount = ref(3);
 
 const items = computed<ControlItem[]>(() => {
   const base: ControlItem[] = [
-    { key: 'github', label: 'GitHub', type: 'link' },
     { key: 'arch', label: 'Arch', type: 'arch' },
     { key: 'search', label: 'Search', type: 'search' },
   ];
   if (props.showTheme) {
     base.push({ key: 'theme', label: 'Theme', type: 'theme' });
   }
+  base.push({ key: 'github', label: 'GitHub', type: 'link' });
   return base;
 });
 
@@ -69,6 +69,9 @@ const hasOverflowItems = computed(() => overflowItems.value.length > 0);
 const showOverflow = computed(() => true);
 const archOpen = ref(false);
 const overflowOpen = ref(false);
+const overflowHover = ref(false);
+const suppressOverflowHover = ref(false);
+const menuOpen = computed(() => overflowOpen.value || (overflowHover.value && !suppressOverflowHover.value));
 
 function setArch(next: 'amd64' | 'arm64') {
   state.arch = next;
@@ -79,6 +82,27 @@ function setTheme(next: 'light' | 'dark') {
   if (next !== props.theme) {
     props.toggleTheme();
   }
+}
+
+function toggleOverflow() {
+  if (overflowOpen.value) {
+    overflowOpen.value = false;
+    if (overflowHover.value) {
+      suppressOverflowHover.value = true;
+    }
+    return;
+  }
+  overflowOpen.value = true;
+  suppressOverflowHover.value = false;
+}
+
+function onOverflowEnter() {
+  overflowHover.value = true;
+}
+
+function onOverflowLeave() {
+  overflowHover.value = false;
+  suppressOverflowHover.value = false;
 }
 
 function setSearchRef(el: HTMLInputElement | null) {
@@ -305,8 +329,22 @@ onBeforeUnmount(() => {
       </div>
     </div>
 
-    <div v-if="showOverflow" class="controls-overflow" :class="{ open: overflowOpen }">
-      <button class="more-trigger" type="button" aria-label="More filters">•••</button>
+    <div
+      v-if="showOverflow"
+      class="controls-overflow"
+      :class="{ open: menuOpen }"
+      @mouseenter="onOverflowEnter"
+      @mouseleave="onOverflowLeave"
+    >
+      <button
+        class="more-trigger"
+        type="button"
+        aria-label="More filters"
+        :aria-expanded="menuOpen"
+        @click="toggleOverflow"
+      >
+        •••
+      </button>
       <div class="more-menu" role="menu">
         <template v-for="item in overflowItems" :key="item.key">
           <div v-if="item.type === 'arch'" class="menu-section">
@@ -335,11 +373,12 @@ onBeforeUnmount(() => {
           <div v-else-if="item.type === 'link'" class="menu-section">
             <div class="menu-title">GitHub</div>
             <a
-              class="menu-button"
+              class="menu-button icon-button"
               href="https://github.com/ivankra/javascript-zoo"
               target="_blank"
               rel="noreferrer"
             >
+              <GitHubIcon :size="16" />
               Open repo
             </a>
           </div>
@@ -704,13 +743,6 @@ onBeforeUnmount(() => {
   background: var(--border-light);
 }
 
-.controls-overflow:hover .more-menu,
-.controls-overflow:focus-within .more-menu {
-  opacity: 1;
-  visibility: visible;
-  transform: translateY(0);
-}
-
 .controls-overflow.open .more-menu {
   opacity: 1;
   visibility: visible;
@@ -747,14 +779,23 @@ onBeforeUnmount(() => {
   letter-spacing: 0;
 }
 
+.icon-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
 .menu-button:hover {
   background: var(--bg-hover);
 }
 
 .menu-button.active {
-  border-color: color-mix(in srgb, var(--text-accent) 60%, transparent);
-  background: color-mix(in srgb, var(--text-accent) 12%, transparent);
+  border-color: var(--text-accent);
   color: var(--text-primary);
+}
+
+:global(.dark) .menu-button.active {
+  background: var(--bg-control);
 }
 
 .controls-measure {

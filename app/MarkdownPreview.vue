@@ -114,10 +114,12 @@ function onKeydown(event: KeyboardEvent) {
 
 onMounted(() => {
   window.addEventListener('keydown', onKeydown);
+  document.body.classList.add('modal-open');
 });
 
 onUnmounted(() => {
   window.removeEventListener('keydown', onKeydown);
+  document.body.classList.remove('modal-open');
 });
 </script>
 
@@ -266,5 +268,28 @@ onUnmounted(() => {
 .markdown-body :deep(summary) {
   cursor: pointer;
   font-weight: 600;
+}
+
+@media (max-width: 720px) {
+  .engine-modal {
+    padding: 0;
+    align-items: stretch;
+    height: 100dvh;
+  }
+
+  .engine-dialog {
+    width: 100%;
+    max-height: 100dvh;
+    height: 100dvh;
+    border-radius: 0;
+  }
+
+  .engine-dialog-header {
+    padding: 16px 16px 12px;
+  }
+
+  .engine-dialog-body {
+    padding: 16px;
+  }
 }
 </style>

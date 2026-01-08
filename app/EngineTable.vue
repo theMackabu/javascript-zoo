@@ -310,7 +310,8 @@ watch(
     <EngineTableControls v-if="props.showControls" :state="state" class="table-controls" />
 
     <div class="table-container" @click="onTableClick">
-      <table>
+      <div class="table-scroll">
+        <table>
         <thead>
           <tr>
             <th
@@ -351,7 +352,8 @@ watch(
             </td>
           </tr>
         </tbody>
-      </table>
+        </table>
+      </div>
     </div>
   </section>
 </template>
@@ -399,6 +401,10 @@ watch(
   box-shadow: none;
   position: relative;
   z-index: 1;
+}
+
+.table-scroll {
+  overflow: visible;
 }
 
 .table-container table {
@@ -633,4 +639,16 @@ watch(
   background-color: var(--bg-hover) !important;
 }
 
+@media (max-width: 720px) {
+  .table-scroll {
+    overflow-x: auto;
+    overflow-y: visible;
+    max-width: 100%;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .table-container th {
+    position: static;
+  }
+}
 </style>
