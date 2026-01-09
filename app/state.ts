@@ -11,6 +11,11 @@ const DEFAULT_ARCH = 'amd64';
 // Default mask that matches the v8-v7 benchmark preset.
 const DEFAULT_MASK = 130688;
 
+export interface HashState {
+  page: string | null;
+  params: URLSearchParams;
+}
+
 export function createInitialState(): TableState {
   return {
     arch: DEFAULT_ARCH,
@@ -19,7 +24,6 @@ export function createInitialState(): TableState {
     search: '',
     sort: DEFAULT_SORT.map((item) => ({ ...item })),
     visibleColumns: {},
-    showEngineVersion: true,
     columnOrder: [],
   };
 }
@@ -52,6 +56,34 @@ export function initColumnOrder(state: TableState, columns: ColumnDef[]): void {
   }
 }
 
+export function resetColumnSelection(
+  state: TableState,
+  columns: ColumnDef[],
+  benchmarks: ColumnDef[],
+): void {
+  state.visibleColumns = {};
+  initVisibleColumns(state, columns);
+  benchmarks.forEach((col, index) => {
+    state.visibleColumns[col.key] = ((DEFAULT_MASK >> index) & 1) === 0;
+  });
+  state.columnOrder = [];
+  initColumnOrder(state, columns);
+}
+
+export function resetStateFromDefaults(
+  state: TableState,
+  columns: ColumnDef[],
+  benchmarks: ColumnDef[],
+): void {
+  const defaults = createInitialState();
+  state.arch = defaults.arch;
+  state.variants = defaults.variants;
+  state.jitless = defaults.jitless;
+  state.search = defaults.search;
+  state.sort = defaults.sort;
+  resetColumnSelection(state, columns, benchmarks);
+}
+
 export function applySort(state: TableState, column: ColumnDef): void {
   if (state.sort[0]?.col === column.key) {
     state.sort[0].dir = state.sort[0].dir === 'desc' ? 'asc' : 'desc';
@@ -69,7 +101,16 @@ export function loadStateFromUrl(
   if (typeof window === 'undefined') {
     return;
   }
-  const params = new URLSearchParams(window.location.search);
+  const hashState = parseHashLocation();
+  const legacyParams = new URLSearchParams(window.location.search);
+  const legacyString = legacyParams.toString();
+  const params = legacyString ? legacyParams : hashState.params;
+
+  if (legacyString) {
+    const nextHash = buildHash(hashState.page, legacyParams);
+    const url = window.location.pathname + nextHash;
+    window.history.replaceState(null, '', url);
+  }
   const variantsParam = params.get('variants') ?? VARIANTS_DEFAULT;
   state.variants = variantsParam === 'all' || variantsParam === 'true';
   state.jitless = variantsParam === 'jitless';
@@ -179,11 +220,42 @@ export function saveStateToUrl(
     params.set('columns', visibleKeys.join(' '));
   }
 
-  const next = params.toString();
-  const hash = window.location.hash;
-  const url = window.location.pathname + (next ? `?${next}` : '') + hash;
-  const current = window.location.search.replace(/^\?/, '');
-  if (current !== next) {
+  const nextHash = buildHash(parseHashLocation().page, params);
+  const url = window.location.pathname + nextHash;
+  if (window.location.hash !== nextHash || window.location.search) {
     window.history.replaceState(null, '', url);
   }
+}
+
+export function parseHashLocation(hash?: string): HashState {
+  const raw = (hash ?? (typeof window !== 'undefined' ? window.location.hash : ''))
+    .replace(/^#/, '')
+    .trim();
+  if (!raw) {
+    return { page: null, params: new URLSearchParams() };
+  }
+  const parts = raw.split('&').filter(Boolean);
+  if (!parts.length) {
+    return { page: null, params: new URLSearchParams() };
+  }
+  const first = parts[0];
+  if (first.includes('=')) {
+    return { page: null, params: new URLSearchParams(parts.join('&')) };
+  }
+  const page = decodeURIComponent(first);
+  const params = new URLSearchParams(parts.slice(1).join('&'));
+  return { page: page || null, params };
+}
+
+export function buildHash(page: string | null, params: URLSearchParams): string {
+  const paramsString = params.toString();
+  const segments: string[] = [];
+  if (page) {
+    segments.push(encodeURIComponent(page));
+  }
+  if (paramsString) {
+    segments.push(paramsString);
+  }
+  const combined = segments.join('&');
+  return combined ? `#${combined}` : '';
 }

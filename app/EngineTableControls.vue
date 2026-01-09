@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import GitHubIcon from './GitHubIcon.vue';
-import ColumnsModal from './ColumnsModal.vue';
 import enginesData from '../engines.json';
 import { buildRows, sortRows } from './data';
 import { ALL_COLUMNS, BENCHMARK_COLUMNS } from './columns';
@@ -22,6 +21,9 @@ const props = withDefaults(defineProps<{
   toggleTheme: () => {},
   showTheme: false,
 });
+const emit = defineEmits<{
+  (event: 'open-columns'): void;
+}>();
 const state = props.state;
 
 const controlsRootRef = ref<HTMLElement | null>(null);
@@ -32,7 +34,6 @@ const archRef = ref<HTMLElement | null>(null);
 const overflowMeasureRef = ref<HTMLElement | null>(null);
 const measureRefs = ref<Record<string, HTMLElement>>({});
 const visibleCount = ref(3);
-const selectColumnsOpen = ref(false);
 
 const items = computed<ControlItem[]>(() => {
   const base: ControlItem[] = [
@@ -89,7 +90,7 @@ function onOverflowLeave() {
 }
 
 function openColumnsModal() {
-  selectColumnsOpen.value = true;
+  emit('open-columns');
   overflowOpen.value = false;
   suppressOverflowHover.value = true;
 }
@@ -158,18 +159,19 @@ function focusSearch() {
   });
 }
 
-function toggleFilter(filter: 'variants' | 'jitless') {
-  if (filter === 'variants') {
-    state.variants = !state.variants;
-    if (state.variants) {
-      state.jitless = false;
-    }
+function setVariants(mode: 'base' | 'all' | 'jitless') {
+  if (mode === 'base') {
+    state.variants = false;
+    state.jitless = false;
     return;
   }
-  state.jitless = !state.jitless;
-  if (state.jitless) {
-    state.variants = false;
+  if (mode === 'all') {
+    state.variants = true;
+    state.jitless = false;
+    return;
   }
+  state.variants = false;
+  state.jitless = true;
 }
 
 function setArchRef(el: HTMLElement | null) {
@@ -315,7 +317,7 @@ onBeforeUnmount(() => {
               @click="archOpen = !archOpen"
             >
               <span class="arch-label">{{ state.arch }}</span>
-              <span class="arch-caret">▾</span>
+              <span class="arch-caret">▼</span>
             </button>
             <div class="arch-menu" role="listbox" aria-label="Architecture">
               <button type="button" @click="setArch('amd64')">
@@ -435,9 +437,17 @@ onBeforeUnmount(() => {
           <div class="preset-row">
             <button
               class="menu-button"
+              :class="{ active: !state.variants && !state.jitless }"
+              type="button"
+              @click="setVariants('base')"
+            >
+              Base
+            </button>
+            <button
+              class="menu-button"
               :class="{ active: state.variants }"
               type="button"
-              @click="toggleFilter('variants')"
+              @click="setVariants('all')"
             >
               All
             </button>
@@ -445,9 +455,9 @@ onBeforeUnmount(() => {
               class="menu-button"
               :class="{ active: state.jitless }"
               type="button"
-              @click="toggleFilter('jitless')"
+              @click="setVariants('jitless')"
             >
-              JIT-less only
+              JITless
             </button>
           </div>
         </div>
@@ -473,7 +483,6 @@ onBeforeUnmount(() => {
       </div>
     </div>
   </div>
-  <ColumnsModal v-if="selectColumnsOpen" :state="state" @close="selectColumnsOpen = false" />
   <div class="controls-measure" aria-hidden="true">
     <template v-for="item in items" :key="item.key">
       <button
@@ -518,8 +527,8 @@ onBeforeUnmount(() => {
   color: var(--text-primary);
   min-width: 0;
   font-weight: 500;
-  font-family: Inter, ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-    'Segoe UI Symbol', 'Noto Color Emoji';
+  font-family: -apple-system, BlinkMacSystemFont, Roboto, ui-sans-serif, system-ui, sans-serif,
+    'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   flex: 1 1 auto;
   justify-content: flex-end;
 }
@@ -725,6 +734,8 @@ onBeforeUnmount(() => {
   color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.08em;
+  font-family: -apple-system, BlinkMacSystemFont, Inter, ui-sans-serif, system-ui, sans-serif,
+    'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
 }
 
 .menu-divider {
@@ -753,7 +764,7 @@ onBeforeUnmount(() => {
 }
 
 .theme-toggle:hover {
-  filter: brightness(1.05);
+  background: var(--bg-hover);
 }
 
 .menu-button {

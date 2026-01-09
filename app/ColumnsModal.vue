@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue';
+import { computed, ref } from 'vue';
 import { ALL_COLUMNS, BENCHMARK_COLUMNS } from './columns';
+import { resetColumnSelection } from './state';
 import type { ColumnDef, TableState } from './types';
 import Modal from './Modal.vue';
 
@@ -9,7 +10,6 @@ const emit = defineEmits<{
   (event: 'close'): void;
 }>();
 
-const showCustomBenchmarks = ref(false);
 const draggingKey = ref<string | null>(null);
 const dragOverKey = ref<string | null>(null);
 const dragOverPosition = ref<'before' | 'after' | null>(null);
@@ -33,6 +33,7 @@ const baseColumns = computed<ColumnDef[]>(() => {
   return ordered;
 });
 
+
 const v8PresetActive = computed(() => {
   return BENCHMARK_COLUMNS.every((col) => {
     const visible = Boolean(props.state.visibleColumns[col.key]);
@@ -44,8 +45,6 @@ const allPresetActive = computed(() => {
   return BENCHMARK_COLUMNS.every((col) => Boolean(props.state.visibleColumns[col.key]));
 });
 
-const customPresetActive = computed(() => !v8PresetActive.value && !allPresetActive.value);
-
 function applyBenchmarkPreset(preset: 'v8' | 'all') {
   if (preset === 'v8') {
     for (const col of BENCHMARK_COLUMNS) {
@@ -56,10 +55,6 @@ function applyBenchmarkPreset(preset: 'v8' | 'all') {
   for (const col of BENCHMARK_COLUMNS) {
     props.state.visibleColumns[col.key] = true;
   }
-}
-
-function showCustomBenchmarksPanel() {
-  showCustomBenchmarks.value = true;
 }
 
 function columnId(prefix: string, key: string): string {
@@ -162,9 +157,10 @@ function closeModal() {
   emit('close');
 }
 
-onMounted(() => {
-  showCustomBenchmarks.value = customPresetActive.value;
-});
+function resetColumns() {
+  resetColumnSelection(props.state, ALL_COLUMNS, BENCHMARK_COLUMNS);
+}
+
 </script>
 
 <template>
@@ -172,34 +168,20 @@ onMounted(() => {
     <div class="columns-dialog">
       <div class="columns-header">
         <div class="columns-title">Select columns</div>
-        <button type="button" class="close-button" @click="closeModal" aria-label="Close">×</button>
+        <div class="columns-actions">
+          <button type="button" class="reset-button header-button" @click="resetColumns">Reset</button>
+          <button
+            type="button"
+            class="close-button header-button"
+            @click="closeModal"
+            aria-label="Close"
+          >
+            ×
+          </button>
+        </div>
       </div>
       <div class="columns-body">
-        <section class="columns-section">
-          <div class="section-title">Engine</div>
-          <table class="columns-table">
-            <tbody>
-              <tr>
-                <td class="col-check">
-                  <input
-                    :id="columnId('engine', 'version')"
-                    type="checkbox"
-                    :checked="props.state.showEngineVersion"
-                    @change="props.state.showEngineVersion = ($event.target as HTMLInputElement).checked"
-                  />
-                </td>
-                <td class="col-name">
-                  <label class="col-label" :for="columnId('engine', 'version')">Show tested engine version</label>
-                </td>
-                <td class="col-desc">
-                  <label class="col-label" :for="columnId('engine', 'version')"></label>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </section>
         <section class="columns-section columns-grid">
-          <div class="section-title">Columns</div>
           <table class="columns-table">
             <tbody>
               <tr
@@ -233,18 +215,12 @@ onMounted(() => {
                   </label>
                 </td>
                 <td class="col-desc">
-                  <label
-                    class="col-label draggable"
-                    :for="columnId('col', col.key)"
-                    @pointerdown="onPointerDown($event, col.key)"
-                    @click="onLabelClick"
-                  >
-                    {{ col.title ?? '' }}
-                  </label>
+                  <label class="col-label" :for="columnId('col', col.key)">{{ col.title ?? '' }}</label>
                 </td>
               </tr>
             </tbody>
           </table>
+          <div class="columns-note">Drag column titles to reorder.</div>
         </section>
 
         <section class="columns-section">
@@ -268,16 +244,8 @@ onMounted(() => {
             >
               v8-v9
             </button>
-            <button
-              class="menu-button"
-              :class="{ active: customPresetActive }"
-              type="button"
-              @click="showCustomBenchmarksPanel"
-            >
-              subset
-            </button>
           </div>
-          <table v-if="showCustomBenchmarks" class="columns-table">
+          <table class="columns-table">
             <tbody>
               <tr v-for="col in BENCHMARK_COLUMNS" :key="col.key">
                 <td class="col-check">
@@ -297,6 +265,9 @@ onMounted(() => {
               </tr>
             </tbody>
           </table>
+          <div class="columns-note">
+            "Score" column is automatically recomputed as geometric mean of selected benchmarks.
+          </div>
         </section>
       </div>
     </div>
@@ -326,10 +297,18 @@ onMounted(() => {
   border-bottom: 1px solid var(--border-light);
 }
 
+.columns-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .columns-title {
   font-size: 16px;
   font-weight: 600;
   color: var(--text-primary);
+  font-family: -apple-system, BlinkMacSystemFont, Inter, ui-sans-serif, system-ui, sans-serif,
+    'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
 }
 
 .columns-body {
@@ -350,6 +329,8 @@ onMounted(() => {
   color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.08em;
+  font-family: -apple-system, BlinkMacSystemFont, Inter, ui-sans-serif, system-ui, sans-serif,
+    'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
 }
 
 .columns-table {
@@ -379,7 +360,7 @@ onMounted(() => {
 }
 
 .col-name {
-  width: 180px;
+  width: 20%;
   font-weight: 500;
   padding-right: 12px;
 }
@@ -410,6 +391,12 @@ onMounted(() => {
 
 .columns-table tr.over-after td {
   box-shadow: inset 0 -2px 0 var(--text-accent);
+}
+
+.columns-note {
+  font-size: 12px;
+  color: var(--text-primary);
+  line-height: 1.4;
 }
 
 
@@ -443,16 +430,31 @@ onMounted(() => {
   background: var(--bg-control);
 }
 
-.close-button {
+.header-button {
   border: 1px solid var(--border-light);
   background: var(--bg-control);
   color: var(--text-primary);
   border-radius: 6px;
-  width: 32px;
   height: 32px;
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.reset-button {
+  padding: 0 12px;
+  font-size: 12px;
+}
+
+.close-button {
+  width: 32px;
   font-size: 18px;
   line-height: 1;
+}
+
+.header-button:hover {
+  background: var(--bg-hover);
 }
 
 @media (max-width: 720px) {

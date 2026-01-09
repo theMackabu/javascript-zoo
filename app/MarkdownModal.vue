@@ -3,6 +3,7 @@ import { computed } from 'vue';
 import MarkdownIt from 'markdown-it';
 import GitHubIcon from './GitHubIcon.vue';
 import Modal from './Modal.vue';
+import { buildHash, parseHashLocation } from './state';
 
 const props = defineProps<{ engine: Record<string, unknown> }>();
 const emit = defineEmits<{
@@ -25,7 +26,8 @@ markdown.renderer.rules.link_open = (tokens, idx, options, env, self) => {
     const engineMatch = rawHref.match(/^([^/]+)\.md(?:[?#].*)?$/);
     if (engineMatch) {
       token.attrSet('data-engine-id', engineMatch[1]);
-      token.attrSet('href', `#${engineMatch[1]}`);
+      const params = typeof window === 'undefined' ? new URLSearchParams() : parseHashLocation().params;
+      token.attrSet('href', buildHash(engineMatch[1], params));
     } else {
       token.attrSet('href', new URL(rawHref, markdownBase).toString());
       token.attrSet('target', '_blank');
@@ -74,7 +76,8 @@ const renderedMarkdown = computed(() => {
     const engineMatch = rawHref.match(/^([^/]+)\.md(?:[?#].*)?$/);
     if (engineMatch) {
       link.setAttribute('data-engine-id', engineMatch[1]);
-      link.setAttribute('href', `#${engineMatch[1]}`);
+      const params = typeof window === 'undefined' ? new URLSearchParams() : parseHashLocation().params;
+      link.setAttribute('href', buildHash(engineMatch[1], params));
       link.removeAttribute('target');
       link.removeAttribute('rel');
     } else {
@@ -112,14 +115,19 @@ function onMarkdownClick(event: MouseEvent) {
   <Modal body-class="modal-open" @close="closeModal" padded>
     <div class="engine-dialog">
       <div class="engine-dialog-header">
-        <a class="engine-dialog-title" :href="engineLink" target="_blank" rel="noreferrer">
-          {{ engineTitle }}
-        </a>
+        <div class="engine-dialog-title">{{ engineTitle }}</div>
         <div class="engine-dialog-actions">
-          <a class="engine-dialog-link" :href="engineLink" target="_blank" rel="noreferrer" aria-label="Open on GitHub">
+          <a
+            class="engine-dialog-link"
+            :href="engineLink"
+            target="_blank"
+            rel="noreferrer"
+            aria-label="View on GitHub"
+            title="View on GitHub"
+          >
             <GitHubIcon :size="18" />
           </a>
-          <button type="button" class="close-button" @click="closeModal" aria-label="Close">×</button>
+          <button type="button" class="close-button" @click="closeModal" aria-label="Close" title="Close">×</button>
         </div>
       </div>
       <div class="engine-dialog-body">
@@ -176,10 +184,8 @@ function onMarkdownClick(event: MouseEvent) {
   font-weight: 600;
   color: var(--text-primary);
   text-decoration: none;
-}
-
-.engine-dialog-title:hover {
-  text-decoration: underline;
+  font-family: -apple-system, BlinkMacSystemFont, Inter, ui-sans-serif, system-ui, sans-serif,
+    'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
 }
 
 .engine-dialog-body {

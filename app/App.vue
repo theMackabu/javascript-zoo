@@ -2,14 +2,16 @@
 import { computed, onMounted, onUnmounted, reactive, ref } from 'vue';
 import EngineTable from './EngineTable.vue';
 import EngineTableControls from './EngineTableControls.vue';
-import { createInitialState, initColumnOrder, initVisibleColumns } from './state';
+import { buildHash, createInitialState, initColumnOrder, initVisibleColumns, parseHashLocation } from './state';
 import { ALL_COLUMNS } from './columns';
 import enginesData from '../engines.json';
 import MarkdownModal from './MarkdownModal.vue';
+import ColumnsModal from './ColumnsModal.vue';
 
 const theme = ref<'light' | 'dark'>('light');
 const state = reactive(createInitialState());
 const selectedEngineId = ref<string | null>(null);
+const columnsOpen = ref(false);
 
 initVisibleColumns(state, ALL_COLUMNS);
 initColumnOrder(state, ALL_COLUMNS);
@@ -40,13 +42,14 @@ function withBase(path: string): string {
 }
 
 function syncFromLocation() {
-  const rawHash = window.location.hash || '';
-  const hash = rawHash.replace(/^#/, '').trim();
-  if (hash && engineMap.value.has(hash)) {
-    selectedEngineId.value = hash;
-  } else {
+  const { page } = parseHashLocation();
+  if (page === 'columns') {
+    columnsOpen.value = true;
     selectedEngineId.value = null;
+    return;
   }
+  columnsOpen.value = false;
+  selectedEngineId.value = page && engineMap.value.has(page) ? page : null;
 }
 
 function applyTheme(next: 'light' | 'dark') {
@@ -63,15 +66,33 @@ function openEngine(id: string) {
   if (!engineMap.value.has(id)) {
     return;
   }
+  columnsOpen.value = false;
   selectedEngineId.value = id;
-  const search = window.location.search;
-  window.history.pushState(null, '', `${withBase('/')}${search}#${id}`);
+  const { params } = parseHashLocation();
+  const nextHash = buildHash(id, params);
+  window.history.pushState(null, '', `${withBase('/')}${nextHash}`);
 }
 
 function closeEngine() {
   selectedEngineId.value = null;
-  const search = window.location.search;
-  window.history.pushState(null, '', `${withBase('/')}${search}`);
+  const { params } = parseHashLocation();
+  const nextHash = buildHash(null, params);
+  window.history.pushState(null, '', `${withBase('/')}${nextHash}`);
+}
+
+function openColumns() {
+  columnsOpen.value = true;
+  selectedEngineId.value = null;
+  const { params } = parseHashLocation();
+  const nextHash = buildHash('columns', params);
+  window.history.pushState(null, '', `${withBase('/')}${nextHash}`);
+}
+
+function closeColumns() {
+  columnsOpen.value = false;
+  const { params } = parseHashLocation();
+  const nextHash = buildHash(null, params);
+  window.history.pushState(null, '', `${withBase('/')}${nextHash}`);
 }
 
 onMounted(() => {
@@ -107,11 +128,17 @@ onUnmounted(() => {
           JavaScript engines zoo
         </a>
         <div class="header-actions">
-          <EngineTableControls :state="state" :theme="theme" :toggle-theme="toggleTheme" :show-theme="true" />
+          <EngineTableControls
+            :state="state"
+            :theme="theme"
+            :toggle-theme="toggleTheme"
+            :show-theme="true"
+            @open-columns="openColumns"
+          />
         </div>
       </div>
     </header>
-    <section class="app-body" :class="{ hidden: selectedEngine }">
+    <section class="app-body" :class="{ hidden: selectedEngine || columnsOpen }">
       <EngineTable :state="state" :show-controls="false" @select-engine="openEngine" />
     </section>
     <MarkdownModal
@@ -120,6 +147,7 @@ onUnmounted(() => {
       @close="closeEngine"
       @open-engine="openEngine"
     />
+    <ColumnsModal v-if="columnsOpen" :state="state" @close="closeColumns" />
   </main>
 </template>
 
@@ -180,8 +208,8 @@ onUnmounted(() => {
   line-height: 1.2;
   letter-spacing: 0.02em;
   font-weight: 600;
-  font-family: Inter, ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-    'Segoe UI Symbol', 'Noto Color Emoji';
+  font-family: -apple-system, BlinkMacSystemFont, Inter, ui-sans-serif, system-ui, sans-serif,
+    'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   text-decoration: none;
 }
 

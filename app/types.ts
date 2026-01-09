@@ -12,7 +12,6 @@ export interface TableState {
   search: string;
   sort: SortSpec[];
   visibleColumns: Record<string, boolean>;
-  showEngineVersion: boolean;
   columnOrder: string[];
 }
 

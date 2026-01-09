@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, reactive, ref, watch } from 'vue';
+import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue';
 import enginesData from '../engines.json';
 import { ALL_COLUMNS, BENCHMARK_COLUMNS } from './columns';
 import { buildRows, sortRows } from './data';
@@ -19,10 +19,13 @@ import {
 } from './format';
 import {
   applySort,
+  buildHash,
   createInitialState,
   initColumnOrder,
   initVisibleColumns,
   loadStateFromUrl,
+  parseHashLocation,
+  resetStateFromDefaults,
   saveStateToUrl,
 } from './state';
 import type { CellContent, ColumnDef, EngineEntry, TableRow, TableState } from './types';
@@ -167,18 +170,21 @@ function onTableClick(event: MouseEvent): void {
   if (!target) {
     return;
   }
+  const selection = window.getSelection();
+  if (selection && selection.type === 'Range' && selection.toString()) {
+    return;
+  }
   if (target.closest('thead')) {
     return;
   }
   if (target.closest('button, input, select, textarea, label, summary')) {
     return;
   }
-  const link = target.closest('a.engine-name') as HTMLAnchorElement | null;
-  const selection = window.getSelection();
-  if (selection && selection.type === 'Range' && selection.toString()) {
+  const link = target.closest('a') as HTMLAnchorElement | null;
+  if (link && !link.classList.contains('engine-name')) {
     return;
   }
-  if (link) {
+  if (link?.classList.contains('engine-name')) {
     const id = link.dataset.engineId;
     if (!id) {
       return;
@@ -187,11 +193,7 @@ function onTableClick(event: MouseEvent): void {
     emit('select-engine', id);
     return;
   }
-  const cell = target.closest('td');
-  if (!cell || target !== cell) {
-    return;
-  }
-  const row = cell.parentElement;
+  const row = target.closest('tr');
   const id = row?.dataset.engineId;
   if (!id) {
     return;
@@ -201,46 +203,40 @@ function onTableClick(event: MouseEvent): void {
 
 function engineLink(row: TableRow): string {
   if (row.id) {
-    const search = typeof window === 'undefined' ? '' : window.location.search;
-    return `${withBase('/')}${search}#${row.id}`;
+    const params = typeof window === 'undefined' ? new URLSearchParams() : parseHashLocation().params;
+    return `${withBase('/')}${buildHash(row.id, params)}`;
   }
   return row.jsz_url ?? '#';
 }
 
 function revisionLink(row: TableRow): CellContent {
   const version = (row.version ?? '').replace(/^nightly$/, '');
-  let revLink = row.repository ?? '';
-
-  if (row.revision && row.repository) {
-    if (row.repository.includes('github.com')) {
-      revLink = `${row.repository.replace('.git', '')}/tree/${row.revision}`;
-    } else if (row.repository.includes('codeberg.org')) {
-      revLink = `${row.repository.replace('.git', '')}/src/commit/${row.revision}`;
-    } else if (row.repository === 'https://chromium.googlesource.com/v8/v8.git') {
-      revLink = `https://github.com/v8/v8/tree/${row.revision}`;
-    }
-  }
+  const revision = typeof row.revision === 'string' ? row.revision.slice(0, 8) : undefined;
+  const repoSource = row.repository ?? row.github ?? '';
+  const repoUrl = repoSource ? repoSource.replace(/\.git$/, '') : '';
+  const title = revision && repoUrl ? `${repoUrl} @${revision}` : revision ? `@${revision}` : undefined;
 
   if (row.revision_date) {
     if (!version || (row.revision && version.includes(row.revision.slice(0, 7)))) {
       return {
-        html: `<a class="engine-version" href="${revLink}" target="_blank" rel="noreferrer">${row.revision_date}</a>`,
-        title: row.version,
+        html: row.revision_date,
+        title,
       };
     }
     return {
-      html: `<a class="engine-version" href="${revLink}" target="_blank" rel="noreferrer">${row.revision_date} (${version})</a>`,
-      title: row.version,
+      html: `${row.revision_date} (${version})`,
+      title,
     };
   }
 
-  if (version && revLink) {
+  if (version) {
     return {
-      html: `<a class="engine-version" href="${revLink}" target="_blank" rel="noreferrer">${version}</a>`,
+      html: version,
+      title,
     };
   }
 
-  return {};
+  return title ? { title } : {};
 }
 
 function renderCell(col: ColumnDef, row: TableRow): CellContent {
@@ -249,7 +245,7 @@ function renderCell(col: ColumnDef, row: TableRow): CellContent {
     const variant = row.variant ? `<div class="engine-variant">${row.variant}</div>` : '';
     const link = engineLink(row);
     const revision = revisionLink(row);
-    const version = state.showEngineVersion ? `<div class="engine-version">${revision.html ?? ''}</div>` : '';
+    const version = `<div class="engine-version">${revision.html ?? ''}</div>`;
 
     return {
       html: `
@@ -316,9 +312,22 @@ function renderCell(col: ColumnDef, row: TableRow): CellContent {
   return value ? { text: String(value) } : {};
 }
 
-onMounted(() => {
+function syncStateFromUrl() {
+  hydrated.value = false;
+  resetStateFromDefaults(state, ALL_COLUMNS, BENCHMARK_COLUMNS);
   loadStateFromUrl(state, ALL_COLUMNS, BENCHMARK_COLUMNS);
   hydrated.value = true;
+}
+
+onMounted(() => {
+  syncStateFromUrl();
+  window.addEventListener('hashchange', syncStateFromUrl);
+  window.addEventListener('popstate', syncStateFromUrl);
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener('hashchange', syncStateFromUrl);
+  window.removeEventListener('popstate', syncStateFromUrl);
 });
 
 watch(
@@ -382,7 +391,7 @@ watch(
 <style scoped>
 .jsz-table {
   color: var(--text-primary);
-  font-family: Roboto, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, Roboto, 'Segoe UI', Helvetica, Arial, sans-serif;
   font-size: 14px;
   width: 100%;
   background-color: var(--bg-primary);
@@ -442,7 +451,7 @@ watch(
   text-align: left;
   border-bottom: 1px solid var(--border-muted);
   vertical-align: top;
-  font-family: Roboto, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, Roboto, 'Segoe UI', Helvetica, Arial, sans-serif;
   font-size: 14px;
 }
 
@@ -461,7 +470,7 @@ watch(
   z-index: 5;
   pointer-events: auto;
   text-align: left;
-  vertical-align: center;
+  vertical-align: middle;
   color: var(--text-primary);
   white-space: nowrap;
   text-transform: uppercase;
@@ -469,6 +478,8 @@ watch(
   font-size: 11px;
   padding-top: 14px;
   padding-bottom: 14px;
+  font-family: -apple-system, BlinkMacSystemFont, Inter, ui-sans-serif, system-ui, sans-serif,
+    'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
 }
 
 .table-container th::before {
@@ -490,12 +501,17 @@ watch(
 
 .table-container td.benchmark {
   padding: 8px 4px;
-  font-family: 'Roboto Condensed', Roboto, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, Roboto, 'Segoe UI', Helvetica, Arial, sans-serif;
 }
 
 
 
-.numeric {
+.table-container th.numeric {
+  text-align: right;
+  color: var(--text-primary);
+}
+
+.table-container td.numeric {
   text-align: right;
   color: var(--text-numeric);
 }
@@ -577,20 +593,6 @@ watch(
   color: var(--text-muted);
   font-size: 12px;
   display: block;
-}
-
-:deep(.engine-version a) {
-  color: var(--text-muted);
-  text-decoration: none;
-}
-
-:global(.dark) :deep(.engine-version a) {
-  color: #99b3ff !important;
-}
-
-:deep(.engine-version a:hover) {
-  text-decoration: underline;
-  text-decoration-skip-ink: none;
 }
 
 .description-cell {
