@@ -2,16 +2,17 @@
 import { computed, onMounted, onUnmounted, reactive, ref } from 'vue';
 import EngineTable from './EngineTable.vue';
 import EngineTableControls from './EngineTableControls.vue';
-import { createInitialState, initSelectedBenchmarks } from './state';
-import { BENCHMARK_COLUMNS } from './columns';
+import { createInitialState, initColumnOrder, initVisibleColumns } from './state';
+import { ALL_COLUMNS } from './columns';
 import enginesData from '../engines.json';
-import MarkdownPreview from './MarkdownPreview.vue';
+import MarkdownModal from './MarkdownModal.vue';
 
 const theme = ref<'light' | 'dark'>('light');
 const state = reactive(createInitialState());
 const selectedEngineId = ref<string | null>(null);
 
-initSelectedBenchmarks(state, BENCHMARK_COLUMNS);
+initVisibleColumns(state, ALL_COLUMNS);
+initColumnOrder(state, ALL_COLUMNS);
 
 const engineMap = computed(() => {
   const map = new Map<string, Record<string, unknown>>();
@@ -97,7 +98,14 @@ onUnmounted(() => {
   <main class="app">
     <header class="app-header">
       <div class="title-row">
-        <span class="app-title-link">JavaScript engines zoo</span>
+        <a
+          class="app-title-link"
+          href="https://github.com/ivankra/javascript-zoo"
+          target="_blank"
+          rel="noreferrer"
+        >
+          JavaScript engines zoo
+        </a>
         <div class="header-actions">
           <EngineTableControls :state="state" :theme="theme" :toggle-theme="toggleTheme" :show-theme="true" />
         </div>
@@ -106,7 +114,7 @@ onUnmounted(() => {
     <section class="app-body" :class="{ hidden: selectedEngine }">
       <EngineTable :state="state" :show-controls="false" @select-engine="openEngine" />
     </section>
-    <MarkdownPreview
+    <MarkdownModal
       v-if="selectedEngine"
       :engine="selectedEngine"
       @close="closeEngine"
@@ -175,6 +183,10 @@ onUnmounted(() => {
   font-family: Inter, ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
     'Segoe UI Symbol', 'Noto Color Emoji';
   text-decoration: none;
+}
+
+.app-title-link:hover {
+  text-decoration: underline;
 }
 
 .app-body.hidden {

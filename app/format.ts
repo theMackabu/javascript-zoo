@@ -85,8 +85,11 @@ export function formatStandard(standard?: string): CellContent {
   if (!standard) {
     return {};
   }
+  if (standard === 'no') {
+    return {};
+  }
   return {
-    text: standard.replace(/^no$/, '❌'),
+    text: standard,
   };
 }
 

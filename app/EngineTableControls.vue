@@ -1,15 +1,16 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
-import { BENCHMARK_COLUMNS } from './columns';
 import GitHubIcon from './GitHubIcon.vue';
-import type { TableState } from './types';
+import ColumnsModal from './ColumnsModal.vue';
+import enginesData from '../engines.json';
+import { buildRows, sortRows } from './data';
+import { ALL_COLUMNS, BENCHMARK_COLUMNS } from './columns';
+import type { EngineEntry, TableState } from './types';
 
 type ControlItem =
-  | { key: 'github'; label: string; type: 'link' }
   | { key: 'arch'; label: string; type: 'arch' }
   | { key: 'search'; label: string; type: 'search' }
   | { key: 'theme'; label: string; type: 'theme' };
-type BenchmarkItem = { key: string; label: string };
 
 const props = withDefaults(defineProps<{
   state: TableState;
@@ -31,6 +32,7 @@ const archRef = ref<HTMLElement | null>(null);
 const overflowMeasureRef = ref<HTMLElement | null>(null);
 const measureRefs = ref<Record<string, HTMLElement>>({});
 const visibleCount = ref(3);
+const selectColumnsOpen = ref(false);
 
 const items = computed<ControlItem[]>(() => {
   const base: ControlItem[] = [
@@ -40,28 +42,8 @@ const items = computed<ControlItem[]>(() => {
   if (props.showTheme) {
     base.push({ key: 'theme', label: 'Theme', type: 'theme' });
   }
-  base.push({ key: 'github', label: 'GitHub', type: 'link' });
   return base;
 });
-
-const benchmarkItems = computed<BenchmarkItem[]>(() => {
-  return BENCHMARK_COLUMNS.map((col) => ({
-    key: col.key,
-    label: col.label,
-  }));
-});
-
-function applyBenchmarkPreset(preset: 'v8' | 'all') {
-  if (preset === 'v8') {
-    for (const col of BENCHMARK_COLUMNS) {
-      state.selected[col.key] = Boolean(col.v8);
-    }
-    return;
-  }
-  for (const col of BENCHMARK_COLUMNS) {
-    state.selected[col.key] = true;
-  }
-}
 
 const visibleItems = computed(() => items.value.slice(0, visibleCount.value));
 const overflowItems = computed(() => items.value.slice(visibleCount.value));
@@ -72,6 +54,7 @@ const overflowOpen = ref(false);
 const overflowHover = ref(false);
 const suppressOverflowHover = ref(false);
 const menuOpen = computed(() => overflowOpen.value || (overflowHover.value && !suppressOverflowHover.value));
+const rawEngines = enginesData as EngineEntry[];
 
 function setArch(next: 'amd64' | 'arm64') {
   state.arch = next;
@@ -103,6 +86,56 @@ function onOverflowEnter() {
 function onOverflowLeave() {
   overflowHover.value = false;
   suppressOverflowHover.value = false;
+}
+
+function openColumnsModal() {
+  selectColumnsOpen.value = true;
+  overflowOpen.value = false;
+  suppressOverflowHover.value = true;
+}
+
+function exportCsv() {
+  const base = ALL_COLUMNS.filter((col) => !col.benchmark);
+  const baseMap = new Map(base.map((col) => [col.key, col]));
+  const orderedKeys: string[] = [];
+  if (baseMap.has('engine')) {
+    orderedKeys.push('engine');
+  }
+  for (const key of state.columnOrder) {
+    if (key !== 'engine' && baseMap.has(key)) {
+      orderedKeys.push(key);
+    }
+  }
+  for (const col of base) {
+    if (col.key !== 'engine' && !orderedKeys.includes(col.key)) {
+      orderedKeys.push(col.key);
+    }
+  }
+  for (const col of BENCHMARK_COLUMNS) {
+    orderedKeys.push(col.key);
+  }
+  const visibleKeys = orderedKeys.filter((key) => key === 'engine' || state.visibleColumns[key]);
+  if (visibleKeys.length === 0) {
+    return;
+  }
+  const rows = [visibleKeys.join(',')];
+  const dataRows = sortRows(buildRows(rawEngines, state, BENCHMARK_COLUMNS), state.sort);
+  for (const row of dataRows) {
+    const values = visibleKeys.map((key) => {
+      const value = key === 'engine' ? (row.title ?? row.engine ?? '') : (row as Record<string, unknown>)[key];
+      const text = value === null || value === undefined ? '' : String(value);
+      const escaped = text.replace(/"/g, '""');
+      return `"${escaped}"`;
+    });
+    rows.push(values.join(','));
+  }
+  const blob = new Blob([rows.join('\n')], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = 'javascript-engines.csv';
+  link.click();
+  URL.revokeObjectURL(url);
 }
 
 function setSearchRef(el: HTMLInputElement | null) {
@@ -255,6 +288,7 @@ watch(overflowItems, () => {
   }
 });
 
+
 onBeforeUnmount(() => {
   resizeObserver?.disconnect();
   window.removeEventListener('resize', computeVisibleCount);
@@ -272,18 +306,7 @@ onBeforeUnmount(() => {
     <div class="controls-main" ref="controlsMainRef">
       <div class="controls-inline">
         <template v-for="item in visibleItems" :key="item.key">
-          <a
-            v-if="item.type === 'link'"
-            class="icon-link"
-            href="https://github.com/ivankra/javascript-zoo"
-            target="_blank"
-            rel="noreferrer"
-            aria-label="Open GitHub repository"
-            title="Open the GitHub repository"
-          >
-            <GitHubIcon :size="20" />
-          </a>
-          <div v-else-if="item.type === 'arch'" class="arch-select" :class="{ open: archOpen }" :ref="setArchRef">
+          <div v-if="item.type === 'arch'" class="arch-select" :class="{ open: archOpen }" :ref="setArchRef">
             <button
               class="arch-trigger"
               type="button"
@@ -350,50 +373,38 @@ onBeforeUnmount(() => {
           <div v-if="item.type === 'arch'" class="menu-section">
             <div class="menu-title">Architecture</div>
             <div class="preset-row">
-            <button
-              class="menu-button"
-              :class="{ active: state.arch === 'amd64' }"
-              type="button"
-              title="amd64: i9-10900K 3.7-5.3GHz - Linux"
-              @click="setArch('amd64')"
-            >
-              amd64
-            </button>
-            <button
-              class="menu-button"
-              :class="{ active: state.arch === 'arm64' }"
-              type="button"
-              title="arm64: Mac M4 4.5GHz - Linux VM"
-              @click="setArch('arm64')"
-            >
-              arm64
-            </button>
+              <button
+                class="menu-button"
+                :class="{ active: state.arch === 'amd64' }"
+                type="button"
+                title="amd64: i9-10900K 3.7-5.3GHz - Linux"
+                @click="setArch('amd64')"
+              >
+                amd64
+              </button>
+              <button
+                class="menu-button"
+                :class="{ active: state.arch === 'arm64' }"
+                type="button"
+                title="arm64: Mac M4 4.5GHz - Linux VM"
+                @click="setArch('arm64')"
+              >
+                arm64
+              </button>
             </div>
-          </div>
-          <div v-else-if="item.type === 'link'" class="menu-section">
-            <div class="menu-title">GitHub</div>
-            <a
-              class="menu-button icon-button"
-              href="https://github.com/ivankra/javascript-zoo"
-              target="_blank"
-              rel="noreferrer"
-            >
-              <GitHubIcon :size="16" />
-              Open repo
-            </a>
           </div>
           <div v-else-if="item.type === 'search'" class="menu-section">
             <div class="menu-title">Search</div>
             <div class="search-field menu-search">
-            <input
-              v-model="state.search"
-              class="search-input"
-              type="search"
-              placeholder="Search..."
-              aria-label="Search engines"
-              title="Search for a string or /regex/"
-              ref="menuSearchRef"
-            />
+              <input
+                v-model="state.search"
+                class="search-input"
+                type="search"
+                placeholder="Search..."
+                aria-label="Search engines"
+                title="Search for a string or /regex/"
+                ref="menuSearchRef"
+              />
             </div>
           </div>
           <div v-else class="menu-section">
@@ -428,7 +439,7 @@ onBeforeUnmount(() => {
               type="button"
               @click="toggleFilter('variants')"
             >
-              Show all
+              All
             </button>
             <button
               class="menu-button"
@@ -442,37 +453,27 @@ onBeforeUnmount(() => {
         </div>
         <div class="menu-divider"></div>
         <div class="menu-section">
-          <div class="menu-title">Benchmarks</div>
-          <div class="preset-row">
-            <button
-              class="menu-button"
-              type="button"
-              title="Select only v8-v7 benchmarks"
-              @click="applyBenchmarkPreset('v8')"
-            >
-              v8-v7
-            </button>
-            <button
-              class="menu-button"
-              type="button"
-              title="Select all benchmarks (v8-v9)"
-              @click="applyBenchmarkPreset('all')"
-            >
-              v8-v9
-            </button>
-          </div>
-          <label v-for="item in benchmarkItems" :key="item.key" class="control-toggle">
-            <input
-              type="checkbox"
-              :checked="state.selected[item.key]"
-              @change="state.selected[item.key] = ($event.target as HTMLInputElement).checked"
-            />
-            {{ item.label }}
-          </label>
+          <div class="menu-title">Data</div>
+          <button class="menu-button" type="button" @click="openColumnsModal">
+            Select columns
+          </button>
+          <button class="menu-button" type="button" @click="exportCsv">
+            Export .csv
+          </button>
+          <a
+            class="menu-button icon-button"
+            href="https://github.com/ivankra/javascript-zoo"
+            target="_blank"
+            rel="noreferrer"
+          >
+            <GitHubIcon :size="16" />
+            Open repo
+          </a>
         </div>
       </div>
     </div>
   </div>
+  <ColumnsModal v-if="selectColumnsOpen" :state="state" @close="selectColumnsOpen = false" />
   <div class="controls-measure" aria-hidden="true">
     <template v-for="item in items" :key="item.key">
       <button
@@ -495,7 +496,7 @@ onBeforeUnmount(() => {
         />
       </div>
       <button
-        v-else-if="item.type === 'arch'"
+        v-else
         :ref="(el) => setMeasureRef(item.key, el as HTMLElement | null)"
         class="arch-trigger"
         type="button"
@@ -503,14 +504,6 @@ onBeforeUnmount(() => {
         <span class="arch-label">{{ state.arch }}</span>
         <span class="arch-caret">▾</span>
       </button>
-      <a
-        v-else
-        :ref="(el) => setMeasureRef(item.key, el as HTMLElement | null)"
-        class="icon-link"
-        href="https://github.com/ivankra/javascript-zoo"
-      >
-        <GitHubIcon :size="20" />
-      </a>
     </template>
     <button ref="overflowMeasureRef" class="more-trigger" type="button" aria-hidden="true">•••</button>
   </div>
@@ -555,16 +548,6 @@ onBeforeUnmount(() => {
   align-items: center;
 }
 
-.icon-link {
-  display: inline-flex;
-  align-items: center;
-  color: var(--text-primary);
-  text-decoration: none;
-  height: 32px;
-  width: 32px;
-  justify-content: center;
-}
-
 .search-input {
   border: 1px solid var(--border-light);
   background: var(--bg-control);
@@ -582,6 +565,10 @@ onBeforeUnmount(() => {
 }
 
 .menu-search {
+  width: 100%;
+}
+
+.menu-search .search-input {
   width: 100%;
 }
 
@@ -725,10 +712,12 @@ onBeforeUnmount(() => {
 .preset-row {
   display: flex;
   gap: 8px;
+  justify-content: center;
 }
 
 .preset-row .menu-button {
   padding: 4px 8px;
+  flex: 1;
 }
 
 .menu-title {
@@ -777,12 +766,18 @@ onBeforeUnmount(() => {
   font-size: 12px;
   text-transform: none;
   letter-spacing: 0;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .icon-button {
   display: inline-flex;
   align-items: center;
   gap: 6px;
+  justify-content: center;
+  text-decoration: none;
 }
 
 .menu-button:hover {

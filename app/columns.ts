@@ -7,7 +7,7 @@ export const BASE_COLUMNS: ColumnDef[] = [
     label: 'Score',
     numeric: true,
     title:
-      'Total score: geometric mean of selected benchmarks. Higher is better (inversely proportional to runtime)',
+      'Total score: geometric mean of visible benchmarks. Higher is better (inversely proportional to runtime)',
   },
   { key: 'binary_size', label: 'Binary', numeric: true, title: 'Binary size' },
   {
@@ -20,6 +20,9 @@ export const BASE_COLUMNS: ColumnDef[] = [
   { key: 'jit', label: 'JIT', title: 'Just-in-time compilation' },
   { key: 'years', label: 'Years', title: 'Years of active development' },
   { key: 'standard', label: 'Target', title: 'Target ECMAScript specification version' },
+  { key: 'es1', label: 'ES1', numeric: true, title: 'ES1 test suite pass rate', defaultHidden: true },
+  { key: 'es3', label: 'ES3', numeric: true, title: 'ES3 test suite pass rate', defaultHidden: true },
+  { key: 'es5', label: 'ES5', numeric: true, title: 'ES5 test suite pass rate', defaultHidden: true },
   { key: 'es1-es5', label: 'ES1-5', numeric: true, title: 'ES1-ES5 test suite pass rate' },
   { key: 'kangax-es6', label: 'ES6', numeric: true, title: "compat-table's ES6 conformance score" },
   {
@@ -28,11 +31,28 @@ export const BASE_COLUMNS: ColumnDef[] = [
     numeric: true,
     title: "compat-table's ES2016+ conformance score",
   },
+  { key: 'kangax-es2016', label: 'ES2016', numeric: true, title: "compat-table's ES2016 conformance score", defaultHidden: true },
+  { key: 'kangax-es2017', label: 'ES2017', numeric: true, title: "compat-table's ES2017 conformance score", defaultHidden: true },
+  { key: 'kangax-es2018', label: 'ES2018', numeric: true, title: "compat-table's ES2018 conformance score", defaultHidden: true },
+  { key: 'kangax-es2019', label: 'ES2019', numeric: true, title: "compat-table's ES2019 conformance score", defaultHidden: true },
+  { key: 'kangax-es2020', label: 'ES2020', numeric: true, title: "compat-table's ES2020 conformance score", defaultHidden: true },
+  { key: 'kangax-es2021', label: 'ES2021', numeric: true, title: "compat-table's ES2021 conformance score", defaultHidden: true },
+  { key: 'kangax-es2022', label: 'ES2022', numeric: true, title: "compat-table's ES2022 conformance score", defaultHidden: true },
+  { key: 'kangax-es2023', label: 'ES2023', numeric: true, title: "compat-table's ES2023 conformance score", defaultHidden: true },
+  { key: 'kangax-es2024', label: 'ES2024', numeric: true, title: "compat-table's ES2024 conformance score", defaultHidden: true },
+  { key: 'kangax-es2025', label: 'ES2025', numeric: true, title: "compat-table's ES2025 conformance score", defaultHidden: true },
+  { key: 'kangax-intl', label: 'ESIntl', numeric: true, title: "compat-table's ES Intl conformance score", defaultHidden: true },
+  { key: 'kangax-next', label: 'ESNext', numeric: true, title: "compat-table's ESNext conformance score", defaultHidden: true },
   { key: 'github_stars', label: 'Stars', numeric: true, title: 'GitHub stars' },
   { key: 'github_contributors', label: 'Contributors', numeric: true, title: 'GitHub contributors count' },
   { key: 'org', label: 'Org' },
   { key: 'license', label: 'License', className: 'license-cell' },
   { key: 'description', label: 'Description', className: 'description-cell' },
+  { key: 'interpreter', label: 'Interpreter', title: 'Interpreter/bytecode mode availability', defaultHidden: true },
+  { key: 'type', label: 'Type', title: 'Engine type (VM, compiler, interpreter)', defaultHidden: true },
+  { key: 'platform', label: 'Platform', title: 'Supported platforms/targets', defaultHidden: true },
+  { key: 'features', label: 'Features', title: 'Notable engine features', defaultHidden: true },
+  { key: 'regex', label: 'Regex', title: 'Regular expression engine details', defaultHidden: true },
 ];
 
 export const BENCHMARK_COLUMNS: ColumnDef[] = [

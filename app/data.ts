@@ -64,7 +64,7 @@ export function buildRows(
 
     const selectedScores: number[] = [];
     for (const col of benchmarks) {
-      if (!state.selected[col.key]) {
+      if (!state.visibleColumns[col.key]) {
         continue;
       }
       const value = row[col.key];

@@ -20,7 +20,8 @@ import {
 import {
   applySort,
   createInitialState,
-  initSelectedBenchmarks,
+  initColumnOrder,
+  initVisibleColumns,
   loadStateFromUrl,
   saveStateToUrl,
 } from './state';
@@ -37,7 +38,8 @@ const internalState = reactive(createInitialState());
 const state = props.state ?? internalState;
 const hydrated = ref(false);
 
-initSelectedBenchmarks(state, BENCHMARK_COLUMNS);
+initVisibleColumns(state, ALL_COLUMNS);
+initColumnOrder(state, ALL_COLUMNS);
 
 function withBase(path: string): string {
   const base = import.meta.env.BASE_URL || '/';
@@ -48,7 +50,7 @@ function withBase(path: string): string {
 }
 
 const lastVisibleBenchmark = computed(() => {
-  const visible = BENCHMARK_COLUMNS.filter((col) => state.selected[col.key]);
+  const visible = BENCHMARK_COLUMNS.filter((col) => state.visibleColumns[col.key]);
   return visible.length ? visible[visible.length - 1].key : null;
 });
 
@@ -57,7 +59,30 @@ const rows = computed(() => {
   return sortRows(data, state.sort);
 });
 
-const columns = computed(() => ALL_COLUMNS);
+const columns = computed(() => {
+  const base = ALL_COLUMNS.filter((col) => !col.benchmark);
+  const baseMap = new Map(base.map((col) => [col.key, col]));
+  const ordered: ColumnDef[] = [];
+  const engine = baseMap.get('engine');
+  if (engine) {
+    ordered.push(engine);
+  }
+  for (const key of state.columnOrder) {
+    if (key === 'engine') {
+      continue;
+    }
+    const col = baseMap.get(key);
+    if (col) {
+      ordered.push(col);
+    }
+  }
+  for (const col of base) {
+    if (!ordered.includes(col) && col.key !== 'engine') {
+      ordered.push(col);
+    }
+  }
+  return [...ordered, ...BENCHMARK_COLUMNS];
+});
 
 const displayRows = computed(() => {
   return rows.value.map((row) => {
@@ -69,11 +94,14 @@ const displayRows = computed(() => {
   });
 });
 
-function isBenchmarkVisible(col: ColumnDef): boolean {
-  if (!col.benchmark) {
+function isColumnVisible(col: ColumnDef): boolean {
+  if (col.key === 'engine') {
     return true;
   }
-  return Boolean(state.selected[col.key]);
+  if (col.benchmark) {
+    return Boolean(state.visibleColumns[col.key]);
+  }
+  return state.visibleColumns[col.key] !== false;
 }
 
 function isSorted(col: ColumnDef): boolean {
@@ -94,10 +122,10 @@ function columnClasses(col: ColumnDef): string[] {
   if (isSorted(col)) {
     classes.push('sorted-column');
   }
-  if (col.benchmark && !state.selected[col.key]) {
+  if (col.benchmark && !state.visibleColumns[col.key]) {
     classes.push('excluded-column');
   }
-  if (!isBenchmarkVisible(col)) {
+  if (!isColumnVisible(col)) {
     classes.push('hidden');
   }
   if (lastVisibleBenchmark.value && col.key === lastVisibleBenchmark.value) {
@@ -221,7 +249,7 @@ function renderCell(col: ColumnDef, row: TableRow): CellContent {
     const variant = row.variant ? `<div class="engine-variant">${row.variant}</div>` : '';
     const link = engineLink(row);
     const revision = revisionLink(row);
-    const version = `<div class="engine-version">${revision.html ?? ''}</div>`;
+    const version = state.showEngineVersion ? `<div class="engine-version">${revision.html ?? ''}</div>` : '';
 
     return {
       html: `
@@ -289,7 +317,7 @@ function renderCell(col: ColumnDef, row: TableRow): CellContent {
 }
 
 onMounted(() => {
-  loadStateFromUrl(state, BENCHMARK_COLUMNS, ALL_COLUMNS);
+  loadStateFromUrl(state, ALL_COLUMNS, BENCHMARK_COLUMNS);
   hydrated.value = true;
 });
 
@@ -299,7 +327,7 @@ watch(
     if (!hydrated.value) {
       return;
     }
-    saveStateToUrl(state, BENCHMARK_COLUMNS);
+    saveStateToUrl(state, ALL_COLUMNS, BENCHMARK_COLUMNS);
   },
   { deep: true },
 );
@@ -321,14 +349,7 @@ watch(
               :title="col.title"
               @click="onHeaderClick(col, $event)"
             >
-              <template v-if="col.benchmark">
-                <div class="control">
-                  {{ shortBenchmarkLabel(col.label) }}
-                </div>
-              </template>
-              <template v-else>
-                {{ col.label }}
-              </template>
+              {{ col.benchmark ? shortBenchmarkLabel(col.label) : col.label }}
             </th>
           </tr>
         </thead>
@@ -432,10 +453,11 @@ watch(
 .table-container th {
   position: sticky;
   top: var(--app-header-height);
-  background: color-mix(in srgb, var(--bg-thead) 88%, transparent);
+  background: color-mix(in srgb, var(--bg-thead) 78%, transparent);
   backdrop-filter: blur(8px);
   font-weight: 500;
   cursor: pointer;
+  user-select: none;
   z-index: 5;
   pointer-events: auto;
   text-align: left;
@@ -465,32 +487,12 @@ watch(
   color: var(--text-accent);
 }
 
-.table-container th.benchmark.sort-asc .control::after,
-.table-container th.benchmark.sort-desc .control::after {
-  color: var(--text-accent);
-}
 
-.benchmark {
+.table-container td.benchmark {
   padding: 8px 4px;
-  text-align: right;
   font-family: 'Roboto Condensed', Roboto, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif;
-  color: var(--text-numeric);
 }
 
-.table-container th.benchmark {
-  padding: 8px 4px;
-  text-align: right;
-}
-
-.benchmark .control {
-  font-size: 9px;
-  font-weight: 500;
-  display: flex;
-  margin: 0;
-  padding: 0;
-  align-items: center;
-  white-space: nowrap;
-}
 
 
 .numeric {
@@ -537,21 +539,6 @@ watch(
   content: '▼';
 }
 
-.benchmark.sort-asc .control::after,
-.benchmark.sort-desc .control::after {
-  display: inline-block;
-  margin-left: 4px;
-  font-size: 10px;
-  color: var(--text-accent);
-}
-
-.benchmark.sort-asc .control::after {
-  content: '▲';
-}
-
-.benchmark.sort-desc .control::after {
-  content: '▼';
-}
 
 .excluded-column {
   opacity: 0.55;

@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted } from 'vue';
+import { computed } from 'vue';
 import MarkdownIt from 'markdown-it';
 import GitHubIcon from './GitHubIcon.vue';
+import Modal from './Modal.vue';
 
 const props = defineProps<{ engine: Record<string, unknown> }>();
 const emit = defineEmits<{
@@ -105,26 +106,10 @@ function onMarkdownClick(event: MouseEvent) {
   event.preventDefault();
   emit('open-engine', engineId);
 }
-
-function onKeydown(event: KeyboardEvent) {
-  if (event.key === 'Escape') {
-    closeModal();
-  }
-}
-
-onMounted(() => {
-  window.addEventListener('keydown', onKeydown);
-  document.body.classList.add('modal-open');
-});
-
-onUnmounted(() => {
-  window.removeEventListener('keydown', onKeydown);
-  document.body.classList.remove('modal-open');
-});
 </script>
 
 <template>
-  <div class="engine-modal" @click.self="closeModal">
+  <Modal body-class="modal-open" @close="closeModal" padded>
     <div class="engine-dialog">
       <div class="engine-dialog-header">
         <a class="engine-dialog-title" :href="engineLink" target="_blank" rel="noreferrer">
@@ -141,21 +126,10 @@ onUnmounted(() => {
         <div class="markdown-body" v-html="renderedMarkdown" @click="onMarkdownClick"></div>
       </div>
     </div>
-  </div>
+  </Modal>
 </template>
 
 <style scoped>
-.engine-modal {
-  position: fixed;
-  inset: 0;
-  background: color-mix(in srgb, var(--bg-primary) 70%, transparent);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 32px 24px;
-  z-index: 30;
-}
-
 .engine-dialog {
   position: relative;
   width: min(960px, 100%);
@@ -271,12 +245,6 @@ onUnmounted(() => {
 }
 
 @media (max-width: 720px) {
-  .engine-modal {
-    padding: 0;
-    align-items: stretch;
-    height: 100dvh;
-  }
-
   .engine-dialog {
     width: 100%;
     max-height: 100dvh;

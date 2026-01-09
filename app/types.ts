@@ -11,7 +11,9 @@ export interface TableState {
   jitless: boolean;
   search: string;
   sort: SortSpec[];
-  selected: Record<string, boolean>;
+  visibleColumns: Record<string, boolean>;
+  showEngineVersion: boolean;
+  columnOrder: string[];
 }
 
 export interface BenchRow {
@@ -76,6 +78,7 @@ export interface ColumnDef {
   className?: string;
   benchmark?: boolean;
   v8?: boolean;
+  defaultHidden?: boolean;
 }
 
 export interface CellContent {

@@ -18,14 +18,36 @@ export function createInitialState(): TableState {
     jitless: false,
     search: '',
     sort: DEFAULT_SORT.map((item) => ({ ...item })),
-    selected: {},
+    visibleColumns: {},
+    showEngineVersion: true,
+    columnOrder: [],
   };
 }
 
-export function initSelectedBenchmarks(state: TableState, columns: ColumnDef[]): void {
+export function initVisibleColumns(state: TableState, columns: ColumnDef[]): void {
   for (const col of columns) {
-    if (state.selected[col.key] === undefined) {
-      state.selected[col.key] = true;
+    if (col.key === 'engine') {
+      state.visibleColumns[col.key] = true;
+      continue;
+    }
+    if (state.visibleColumns[col.key] === undefined) {
+      state.visibleColumns[col.key] = !col.defaultHidden;
+    }
+  }
+}
+
+export function initColumnOrder(state: TableState, columns: ColumnDef[]): void {
+  if (state.columnOrder.length === 0) {
+    state.columnOrder = columns
+      .filter((col) => !col.benchmark && col.key !== 'engine')
+      .map((col) => col.key);
+    return;
+  }
+  const available = new Set(columns.filter((col) => !col.benchmark && col.key !== 'engine').map((col) => col.key));
+  state.columnOrder = state.columnOrder.filter((key) => available.has(key));
+  for (const key of available) {
+    if (!state.columnOrder.includes(key)) {
+      state.columnOrder.push(key);
     }
   }
 }
@@ -41,8 +63,8 @@ export function applySort(state: TableState, column: ColumnDef): void {
 
 export function loadStateFromUrl(
   state: TableState,
-  benchmarks: ColumnDef[],
   columns: ColumnDef[],
+  benchmarks: ColumnDef[],
 ): void {
   if (typeof window === 'undefined') {
     return;
@@ -62,15 +84,35 @@ export function loadStateFromUrl(
     }];
   }
 
-  const maskParam = params.get('mask');
-  let mask = maskParam ? Number.parseInt(maskParam, 10) : DEFAULT_MASK;
-  // Legacy URL param: v8=false meant "show all benchmarks".
-  if (params.get('v8') === 'false') {
-    mask = 0;
+  const columnsParam = params.get('columns');
+  if (columnsParam) {
+    const requested = columnsParam.split(/\s+/).map((key) => key.trim()).filter(Boolean);
+    const valid = new Set(columns.map((col) => col.key));
+    const visible = new Set(requested.filter((key) => valid.has(key)));
+    visible.add('engine');
+    for (const col of columns) {
+      if (col.key === 'engine') {
+        state.visibleColumns[col.key] = true;
+        continue;
+      }
+      state.visibleColumns[col.key] = visible.has(col.key);
+    }
+    const ordered = requested.filter((key) => {
+      const col = columns.find((item) => item.key === key);
+      return col && !col.benchmark && col.key !== 'engine';
+    });
+    state.columnOrder = ordered;
+  } else {
+    const maskParam = params.get('mask');
+    let mask = maskParam ? Number.parseInt(maskParam, 10) : DEFAULT_MASK;
+    // Legacy URL param: v8=false meant "show all benchmarks".
+    if (params.get('v8') === 'false') {
+      mask = 0;
+    }
+    benchmarks.forEach((col, index) => {
+      state.visibleColumns[col.key] = ((mask >> index) & 1) === 0;
+    });
   }
-  benchmarks.forEach((col, index) => {
-    state.selected[col.key] = ((mask >> index) & 1) === 0;
-  });
 
   if (state.sort.length === 1) {
     const primary = state.sort[0];
@@ -81,7 +123,11 @@ export function loadStateFromUrl(
   }
 }
 
-export function saveStateToUrl(state: TableState, benchmarks: ColumnDef[]): void {
+export function saveStateToUrl(
+  state: TableState,
+  columns: ColumnDef[],
+  benchmarks: ColumnDef[],
+): void {
   if (typeof window === 'undefined') {
     return;
   }
@@ -103,14 +149,34 @@ export function saveStateToUrl(state: TableState, benchmarks: ColumnDef[]): void
     }
   }
 
-  let mask = 0;
+  const orderedBase = columns.filter((col) => !col.benchmark && col.key !== 'engine');
+  const baseMap = new Map(orderedBase.map((col) => [col.key, col]));
+  const orderedKeys: string[] = [];
+  for (const key of state.columnOrder) {
+    if (baseMap.has(key)) {
+      orderedKeys.push(key);
+    }
+  }
+  for (const col of orderedBase) {
+    if (!orderedKeys.includes(col.key)) {
+      orderedKeys.push(col.key);
+    }
+  }
+  for (const col of benchmarks) {
+    orderedKeys.push(col.key);
+  }
+  const visibleKeys = orderedKeys.filter((key) => state.visibleColumns[key]);
+  const defaultVisible = columns
+    .filter((col) => !col.benchmark && !col.defaultHidden && col.key !== 'engine')
+    .map((col) => col.key);
   benchmarks.forEach((col, index) => {
-    if (!state.selected[col.key]) {
-      mask |= 1 << index;
+    const hidden = ((DEFAULT_MASK >> index) & 1) === 1;
+    if (!hidden) {
+      defaultVisible.push(col.key);
     }
   });
-  if (mask !== DEFAULT_MASK) {
-    params.set('mask', String(mask));
+  if (visibleKeys.join(' ') !== defaultVisible.join(' ')) {
+    params.set('columns', visibleKeys.join(' '));
   }
 
   const next = params.toString();
