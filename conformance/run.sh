@@ -1,12 +1,3 @@
-#!/bin/bash
-# Usage: run.sh [-o output.txt] [-j jobs] [--next] [engine [args]] [test.js ...]
-#
-# Should work with most engine shells and runtimes
-# that provide console.log() method or similar.
-#
-# SPDX-FileCopyrightText: 2025 Ivan Krasilnikov
-# SPDX-License-Identifier: MIT
-
 export LC_ALL=en_US.UTF-8
 
 SCRIPT_DIR=$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")
@@ -125,20 +116,20 @@ do_part() {
   local part_output_file="$1"; shift
   local abspath
 
-  export SED_FILE=$(mktemp --suffix=.js)
+  export SED_FILE=$(gmktemp --suffix=.js)
 
   for abspath in "$@"; do
     local basename="$(basename -- "$abspath")"
-    local tmpfile=$(mktemp)
+    local tmpfile=$(gmktemp)
     rm -f "$tmpfile" "$tmpfile.time"
 
-    timeout 3s stdbuf -oL -eL /usr/bin/time -v -o "$tmpfile.time" \
+    timeout 3s stdbuf -oL -eL gtime -v -o "$tmpfile.time" \
       "${ENGINE_CMD[@]}" "$abspath" </dev/null 2>&1 \
       | tee "$tmpfile"
 
     local relpath="$abspath"
     if [[ "$relpath" == "$SCRIPT_DIR/"* ]]; then
-      relpath="$(realpath --relative-to="$SCRIPT_DIR" -- "$abspath")"
+      relpath="$(grealpath --relative-to="$SCRIPT_DIR" -- "$abspath")"
     fi
 
     if ! fgrep -q -i "$basename: fail" "$tmpfile" && \
@@ -189,7 +180,7 @@ do_part() {
 }
 
 main() {
-  local output="$(mktemp)"
+  local output="$(gmktemp)"
 
   rm -f "$OUTPUT_FILE"
 
