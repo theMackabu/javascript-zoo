@@ -1,4 +1,4 @@
-Metadata: {"arch": "arm64", "binary_sha256": "f0a690244507ea60eea7e712418c6e816440cf30b544e8218c570a2765ade2b8", "binary_size": 3738800, "engine": "ant", "repository": "https://github.com/themackabu/ant", "revision": "7caf72b08240cc8d286fc96fcc0b5d9162365b61", "revision_date": "2026-1-19"}
+Metadata: {"arch": "arm64", "binary_sha256": "9323b14cdf0d3fb33819035a45317ddb055d09ae75d5c643f689106ba28be942", "binary_size": 3776464, "engine": "ant", "repository": "https://github.com/themackabu/ant", "revision": "60484e1771272c87b986db225d1b4eba17076790", "revision_date": "2026-1-20"}
 es1/Array.js: OK
 es1/Array.length.assignment.js: OK
 es1/Array.length.js: OK
@@ -588,7 +588,7 @@ kangax-es6/Promise.constructor-requires-new.js: OK
 kangax-es6/Promise.js: OK
 kangax-es6/Promise.prototype-not-instance.js: OK
 kangax-es6/Promise.race.iterable.js: failed
-kangax-es6/Promise.race.js: timeout
+kangax-es6/Promise.race.js: OK
 kangax-es6/Proxy.Array.isArray.js: failed
 kangax-es6/Proxy.JSON.stringify.js: failed
 kangax-es6/Proxy.constructor-requires-new.js: failed
@@ -1333,11 +1333,11 @@ kangax-es2020/optional-chaining.function-call.js: failed
 kangax-es2020/optional-chaining.method-call.js: failed
 kangax-es2020/optional-chaining.property.js: OK
 kangax-es2020/optional-chaining.spread-params.js: failed
-kangax-es2021/FinalizationRegistry.js: failed
+kangax-es2021/FinalizationRegistry.js: OK
 kangax-es2021/Promise.any.AggregateError.js: OK
 kangax-es2021/Promise.any.fulfillment.js: OK
 kangax-es2021/String.prototype.replaceAll.js: OK
-kangax-es2021/WeakRef.js: failed
+kangax-es2021/WeakRef.js: OK
 kangax-es2021/logical-assignment.and.js: OK
 kangax-es2021/logical-assignment.and.setter-not-invoked.js: OK
 kangax-es2021/logical-assignment.and.short-circuit.js: OK
@@ -1394,9 +1394,9 @@ kangax-es2023/Array.prototype.toReversed.js: OK
 kangax-es2023/Array.prototype.toSorted.js: OK
 kangax-es2023/Array.prototype.toSpliced.js: OK
 kangax-es2023/Array.prototype.with.js: OK
-kangax-es2023/TypedArray.prototype.toReversed.js: failed
-kangax-es2023/TypedArray.prototype.toSorted.js: failed
-kangax-es2023/TypedArray.prototype.with.js: failed
+kangax-es2023/TypedArray.prototype.toReversed.js: OK
+kangax-es2023/TypedArray.prototype.toSorted.js: OK
+kangax-es2023/TypedArray.prototype.with.js: OK
 kangax-es2023/hashbang.js: OK
 kangax-es2024/ArrayBuffer.prototype.detached.js: failed
 kangax-es2024/ArrayBuffer.prototype.transferToFixedLength.js: failed
