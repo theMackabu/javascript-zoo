@@ -584,7 +584,7 @@ kangax-es6/Object.setPrototypeOf.js: OK
 kangax-es6/Promise.Symbol.species.js: failed
 kangax-es6/Promise.all.iterable.js: failed
 kangax-es6/Promise.all.js: timeout
-kangax-es6/Promise.constructor-requires-new.js: failed
+kangax-es6/Promise.constructor-requires-new.js: OK
 kangax-es6/Promise.js: OK
 kangax-es6/Promise.prototype-not-instance.js: OK
 kangax-es6/Promise.race.iterable.js: failed
@@ -1115,10 +1115,10 @@ kangax-es6/template.tagged.js: failed
 kangax-es6/template.toString.js: failed
 kangax-es6/typed-arrays.ArrayBuffer.Symbol.species.js: failed
 kangax-es6/typed-arrays.DataView.Float32.js: failed
-kangax-es6/typed-arrays.DataView.Float64.js: failed
+kangax-es6/typed-arrays.DataView.Float64.js: OK
 kangax-es6/typed-arrays.DataView.Int8.js: failed
-kangax-es6/typed-arrays.DataView.Int16.js: failed
-kangax-es6/typed-arrays.DataView.Int32.js: failed
+kangax-es6/typed-arrays.DataView.Int16.js: OK
+kangax-es6/typed-arrays.DataView.Int32.js: OK
 kangax-es6/typed-arrays.DataView.Uint8.js: OK
 kangax-es6/typed-arrays.DataView.Uint16.js: failed
 kangax-es6/typed-arrays.DataView.Uint32.js: failed
@@ -1222,9 +1222,9 @@ kangax-es2017/Object.getOwnPropertyDescriptors.no-undefined.js: failed
 kangax-es2017/Object.values.js: failed
 kangax-es2017/SharedArrayBuffer.Symbol.species.js: failed
 kangax-es2017/SharedArrayBuffer.js: OK
-kangax-es2017/SharedArrayBuffer.prototype.Symbol.toStringTag.js: failed
+kangax-es2017/SharedArrayBuffer.prototype.Symbol.toStringTag.js: OK
 kangax-es2017/SharedArrayBuffer.prototype.byteLength.js: failed
-kangax-es2017/SharedArrayBuffer.prototype.slice.js: failed
+kangax-es2017/SharedArrayBuffer.prototype.slice.js: OK
 kangax-es2017/String.prototype.padEnd.js: OK
 kangax-es2017/String.prototype.padStart.js: OK
 kangax-es2017/annex-b.Object.prototype.__defineGetter__.ToObject.js: failed
@@ -1254,7 +1254,7 @@ kangax-es2017/async.arrow.js: OK
 kangax-es2017/async.await-non-promise.js: crashed (signal 11)
 kangax-es2017/async.await-rejection.js: crashed (signal 11)
 kangax-es2017/async.await.js: timeout
-kangax-es2017/async.constructor.js: crashed (signal 11)
+kangax-es2017/async.constructor.js: timeout
 kangax-es2017/async.methods-class.js: crashed (signal 11)
 kangax-es2017/async.methods-object.js: failed
 kangax-es2017/async.must-await-value.js: OK
@@ -1262,15 +1262,15 @@ kangax-es2017/async.no-await-in-params.js: failed
 kangax-es2017/async.no-line-break.js: failed
 kangax-es2017/async.no-prototype.js: failed
 kangax-es2017/async.prototype-chain.js: failed
-kangax-es2017/async.return.js: crashed (signal 11)
-kangax-es2017/async.throw.js: crashed (signal 11)
+kangax-es2017/async.return.js: OK
+kangax-es2017/async.throw.js: OK
 kangax-es2017/misc.arguments-caller-removed.js: OK
 kangax-es2017/regex.flags.u.case-folding.js: OK
 kangax-es2017/trailing-comma.arguments.js: OK
 kangax-es2017/trailing-comma.params.js: OK
 kangax-es2018/Promise.prototype.finally.change-rejection.js: crashed (signal 11)
 kangax-es2018/Promise.prototype.finally.js: crashed (signal 11)
-kangax-es2018/Promise.prototype.finally.no-change-resolution.js: crashed (signal 11)
+kangax-es2018/Promise.prototype.finally.no-change-resolution.js: timeout
 kangax-es2018/async-iterators.for-await-of.js: failed
 kangax-es2018/async-iterators.generators.js: failed
 kangax-es2018/misc.Proxy-ownKeys-duplicate-keys.js: failed
@@ -1335,7 +1335,7 @@ kangax-es2020/optional-chaining.property.js: OK
 kangax-es2020/optional-chaining.spread-params.js: failed
 kangax-es2021/FinalizationRegistry.js: failed
 kangax-es2021/Promise.any.AggregateError.js: timeout
-kangax-es2021/Promise.any.fulfillment.js: crashed (signal 11)
+kangax-es2021/Promise.any.fulfillment.js: OK
 kangax-es2021/String.prototype.replaceAll.js: OK
 kangax-es2021/WeakRef.js: failed
 kangax-es2021/logical-assignment.and.js: OK
