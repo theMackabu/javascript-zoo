@@ -583,7 +583,7 @@ kangax-es6/Object.is.js: failed
 kangax-es6/Object.setPrototypeOf.js: OK
 kangax-es6/Promise.Symbol.species.js: failed
 kangax-es6/Promise.all.iterable.js: failed
-kangax-es6/Promise.all.js: failed
+kangax-es6/Promise.all.js: timeout
 kangax-es6/Promise.constructor-requires-new.js: OK
 kangax-es6/Promise.js: OK
 kangax-es6/Promise.prototype-not-instance.js: OK
@@ -1082,7 +1082,7 @@ kangax-es6/subclassing.Function.prototype.apply.js: OK
 kangax-es6/subclassing.Function.prototype.bind.js: failed
 kangax-es6/subclassing.Function.prototype.call.js: OK
 kangax-es6/subclassing.Promise.all.js: failed
-kangax-es6/subclassing.Promise.js: failed
+kangax-es6/subclassing.Promise.js: OK
 kangax-es6/subclassing.Promise.prototype-chain.js: failed
 kangax-es6/subclassing.Promise.race.js: failed
 kangax-es6/subclassing.RegExp.exec.js: OK
@@ -1334,7 +1334,7 @@ kangax-es2020/optional-chaining.method-call.js: failed
 kangax-es2020/optional-chaining.property.js: OK
 kangax-es2020/optional-chaining.spread-params.js: failed
 kangax-es2021/FinalizationRegistry.js: failed
-kangax-es2021/Promise.any.AggregateError.js: failed
+kangax-es2021/Promise.any.AggregateError.js: OK
 kangax-es2021/Promise.any.fulfillment.js: OK
 kangax-es2021/String.prototype.replaceAll.js: OK
 kangax-es2021/WeakRef.js: failed
@@ -1348,7 +1348,7 @@ kangax-es2021/logical-assignment.or.js: OK
 kangax-es2021/logical-assignment.or.setter-not-invoked.js: OK
 kangax-es2021/logical-assignment.or.short-circuit.js: OK
 kangax-es2021/numeric-separators.js: OK
-kangax-es2022/Error.cause.AggregateError-prototype-lacks.js: failed
+kangax-es2022/Error.cause.AggregateError-prototype-lacks.js: OK
 kangax-es2022/Error.cause.AggregateError.js: failed
 kangax-es2022/Error.cause.Error-prototype-lacks.js: OK
 kangax-es2022/Error.cause.Error.js: failed
@@ -1427,7 +1427,7 @@ kangax-es2025/Iterator.prototype.reduce.js: OK
 kangax-es2025/Iterator.prototype.some.js: OK
 kangax-es2025/Iterator.prototype.take.js: failed
 kangax-es2025/Iterator.prototype.toArray.js: failed
-kangax-es2025/Promise.try.js: failed
+kangax-es2025/Promise.try.js: OK
 kangax-es2025/RegExp.escape.js: failed
 kangax-es2025/Set.prototype.difference.js: failed
 kangax-es2025/Set.prototype.intersection.js: failed
