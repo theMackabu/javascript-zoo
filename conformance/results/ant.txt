@@ -1012,7 +1012,7 @@ kangax-es6/misc.Proxy.set.Array.reverse.js: failed
 kangax-es6/misc.Proxy.set.Array.shift.js: failed
 kangax-es6/misc.Proxy.set.Array.splice.js: failed
 kangax-es6/misc.Proxy.set.Array.unshift.js: failed
-kangax-es6/misc.Proxy.set.Object.assign.js: failed
+kangax-es6/misc.Proxy.set.Object.assign.js: OK
 kangax-es6/misc.RegExp-alter-flags.js: OK
 kangax-es6/misc.RegExp-prototype-toString-generic.js: failed
 kangax-es6/misc.accessors-no-constructor.js: failed
@@ -1028,11 +1028,11 @@ kangax-es6/misc.function-length-configurable.js: OK
 kangax-es6/misc.identifier-syntax.no-escaped-reserved.js: OK
 kangax-es6/misc.identifier-syntax.var-1.js: failed
 kangax-es6/misc.identifier-syntax.var-2.js: OK
-kangax-es6/misc.property-order.JSON.parse.js: failed
+kangax-es6/misc.property-order.JSON.parse.js: OK
 kangax-es6/misc.property-order.JSON.stringify.js: failed
 kangax-es6/misc.property-order.Object.assign.js: failed
 kangax-es6/misc.property-order.Object.getOwnPropertyNames.js: failed
-kangax-es6/misc.property-order.Object.keys.js: failed
+kangax-es6/misc.property-order.Object.keys.js: OK
 kangax-es6/misc.property-order.Reflect.ownKeys.string.js: failed
 kangax-es6/misc.property-order.Reflect.ownKeys.symbol.js: failed
 kangax-es6/misc.prototypes-not-instances.js: failed
