@@ -671,7 +671,7 @@ kangax-es6/Set.zero-key.js: failed
 kangax-es6/String.fromCodePoint.js: OK
 kangax-es6/String.iterator-prototype-chain.js: failed
 kangax-es6/String.prototype.Symbol.iterator.js: OK
-kangax-es6/String.prototype.codePointAt.js: failed
+kangax-es6/String.prototype.codePointAt.js: OK
 kangax-es6/String.prototype.endsWith.js: OK
 kangax-es6/String.prototype.endsWith.throws-regex.js: failed
 kangax-es6/String.prototype.includes.js: OK
@@ -686,7 +686,7 @@ kangax-es6/Symbol.Object.js: failed
 kangax-es6/Symbol.String.js: OK
 kangax-es6/Symbol.defineProperty.js: failed
 kangax-es6/Symbol.global-registry.js: OK
-kangax-es6/Symbol.hidden-keys.js: failed
+kangax-es6/Symbol.hidden-keys.js: OK
 kangax-es6/Symbol.js: OK
 kangax-es6/Symbol.no-coerce.js: failed
 kangax-es6/Symbol.no-new.js: failed
