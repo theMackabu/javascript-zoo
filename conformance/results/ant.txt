@@ -1398,9 +1398,9 @@ kangax-es2023/TypedArray.prototype.toReversed.js: OK
 kangax-es2023/TypedArray.prototype.toSorted.js: OK
 kangax-es2023/TypedArray.prototype.with.js: OK
 kangax-es2023/hashbang.js: OK
-kangax-es2024/ArrayBuffer.prototype.detached.js: failed
-kangax-es2024/ArrayBuffer.prototype.transferToFixedLength.js: failed
-kangax-es2024/ArrayBuffer.prototype.transfer.js: failed
+kangax-es2024/ArrayBuffer.prototype.detached.js: OK
+kangax-es2024/ArrayBuffer.prototype.transferToFixedLength.js: OK
+kangax-es2024/ArrayBuffer.prototype.transfer.js: OK
 kangax-es2024/Map.groupBy.js: failed
 kangax-es2024/Object.groupBy.js: failed
 kangax-es2024/Promise.withResolvers.js: failed
