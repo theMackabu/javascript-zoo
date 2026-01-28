@@ -632,12 +632,12 @@ kangax-es6/Reflect.construct.js: OK
 kangax-es6/Reflect.construct.new-target.js: failed
 kangax-es6/Reflect.construct.third-argument.js: failed
 kangax-es6/Reflect.defineProperty.js: failed
-kangax-es6/Reflect.deleteProperty.js: failed
+kangax-es6/Reflect.deleteProperty.js: OK
 kangax-es6/Reflect.getOwnPropertyDescriptor.js: OK
 kangax-es6/Reflect.getPrototypeOf.js: OK
 kangax-es6/Reflect.get.js: OK
 kangax-es6/Reflect.has.js: OK
-kangax-es6/Reflect.isExtensible.js: failed
+kangax-es6/Reflect.isExtensible.js: OK
 kangax-es6/Reflect.ownKeys.string.js: OK
 kangax-es6/Reflect.ownKeys.symbol.js: failed
 kangax-es6/Reflect.preventExtensions.js: OK
