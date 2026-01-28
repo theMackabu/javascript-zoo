@@ -878,7 +878,7 @@ kangax-es6/destructuring-params.throws-null-undefined.js: failed
 kangax-es6/destructuring-params.trailing-comma-iterable.js: OK
 kangax-es6/destructuring-params.trailing-comma-object.js: OK
 kangax-es6/for-of.array.js: OK
-kangax-es6/for-of.astral-string.js: failed
+kangax-es6/for-of.astral-string.js: OK
 kangax-es6/for-of.generator.js: failed
 kangax-es6/for-of.iterable-instance.js: OK
 kangax-es6/for-of.iterable.js: OK
@@ -1040,8 +1040,8 @@ kangax-es6/new-target.assignment-error.js: failed
 kangax-es6/new-target.constructor.js: failed
 kangax-es6/regex.flags.u.case-folding.js: OK
 kangax-es6/regex.flags.u.codepoint.js: failed
-kangax-es6/regex.flags.u.js: failed
-kangax-es6/regex.flags.u.non-bmp.js: failed
+kangax-es6/regex.flags.u.js: OK
+kangax-es6/regex.flags.u.non-bmp.js: OK
 kangax-es6/regex.flags.y.js: failed
 kangax-es6/regex.flags.y.lastIndex.js: failed
 kangax-es6/rest-params.arguments.js: OK
@@ -1103,8 +1103,8 @@ kangax-es6/super.property-access.js: OK
 kangax-es6/super.statement.js: OK
 kangax-es6/super.static-binding.js: OK
 kangax-es6/super.this-binding.js: OK
-kangax-es6/tail-calls.direct.js: crashed (signal 11)
-kangax-es6/tail-calls.mutual.js: crashed (signal 11)
+kangax-es6/tail-calls.direct.js: failed
+kangax-es6/tail-calls.mutual.js: failed
 kangax-es6/template.basic.js: OK
 kangax-es6/template.caching.js: failed
 kangax-es6/template.escape-sequences.js: failed
@@ -1381,7 +1381,7 @@ kangax-es2022/class-fields.public-instance.js: OK
 kangax-es2022/class-fields.public-static.js: OK
 kangax-es2022/class-fields.static.define.js: OK
 kangax-es2022/class-methods.private-accessor.js: failed
-kangax-es2022/class-methods.private-instance.js: crashed (signal 11)
+kangax-es2022/class-methods.private-instance.js: failed
 kangax-es2022/class-methods.private-static-accessor.js: failed
 kangax-es2022/class-methods.private-static.js: OK
 kangax-es2022/class-static-init-blocks.js: failed
