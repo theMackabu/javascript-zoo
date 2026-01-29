@@ -1253,7 +1253,7 @@ kangax-es2017/async.arrow-in-class.js: OK
 kangax-es2017/async.arrow.js: OK
 kangax-es2017/async.await-non-promise.js: OK
 kangax-es2017/async.await-rejection.js: OK
-kangax-es2017/async.await.js: timeout
+kangax-es2017/async.await.js: OK
 kangax-es2017/async.constructor.js: OK
 kangax-es2017/async.methods-class.js: OK
 kangax-es2017/async.methods-object.js: failed
