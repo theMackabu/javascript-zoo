@@ -578,7 +578,7 @@ kangax-es6/Number.isSafeInteger.js: OK
 kangax-es6/Number.parseFloat.js: failed
 kangax-es6/Number.parseInt.js: failed
 kangax-es6/Object.assign.js: OK
-kangax-es6/Object.getOwnPropertySymbols.js: failed
+kangax-es6/Object.getOwnPropertySymbols.js: OK
 kangax-es6/Object.is.js: failed
 kangax-es6/Object.setPrototypeOf.js: OK
 kangax-es6/Promise.Symbol.species.js: failed
@@ -690,7 +690,7 @@ kangax-es6/Symbol.hidden-keys.js: OK
 kangax-es6/Symbol.js: OK
 kangax-es6/Symbol.no-coerce.js: failed
 kangax-es6/Symbol.no-new.js: failed
-kangax-es6/Symbol.prototype.js: failed
+kangax-es6/Symbol.prototype.js: OK
 kangax-es6/Symbol.typeof.js: OK
 kangax-es6/WeakMap.accept-primitives.js: OK
 kangax-es6/WeakMap.constructor-accepts-null.js: OK
@@ -843,7 +843,7 @@ kangax-es6/destructuring-decl.iterable.js: failed
 kangax-es6/destructuring-decl.iterator-closing.js: failed
 kangax-es6/destructuring-decl.multiple-var.js: OK
 kangax-es6/destructuring-decl.nested.js: failed
-kangax-es6/destructuring-decl.object-primitives.js: crashed (signal 6)
+kangax-es6/destructuring-decl.object-primitives.js: OK
 kangax-es6/destructuring-decl.object.js: OK
 kangax-es6/destructuring-decl.rest.js: OK
 kangax-es6/destructuring-decl.sparse-array.js: OK
@@ -868,7 +868,7 @@ kangax-es6/destructuring-params.iterator-closing.js: failed
 kangax-es6/destructuring-params.length.js: OK
 kangax-es6/destructuring-params.nested.js: failed
 kangax-es6/destructuring-params.new-function.js: OK
-kangax-es6/destructuring-params.object-primitives.js: failed
+kangax-es6/destructuring-params.object-primitives.js: OK
 kangax-es6/destructuring-params.object.js: OK
 kangax-es6/destructuring-params.rest.js: OK
 kangax-es6/destructuring-params.shorthand-defaults-arrow.js: OK
