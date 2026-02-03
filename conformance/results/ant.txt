@@ -514,7 +514,7 @@ kangax-es6/Array.prototype.find.js: OK
 kangax-es6/Array.prototype.keys.js: OK
 kangax-es6/Array.prototype.splice.js: failed
 kangax-es6/Array.prototype.values.js: OK
-kangax-es6/Date.prototype.Symbol.toPrimitive.js: failed
+kangax-es6/Date.prototype.Symbol.toPrimitive.js: OK
 kangax-es6/Function.name.accessor.js: failed
 kangax-es6/Function.name.bound.js: failed
 kangax-es6/Function.name.class-expression.js: OK
@@ -1112,7 +1112,7 @@ kangax-es6/template.frozen-array.js: failed
 kangax-es6/template.line-break.js: failed
 kangax-es6/template.permanent-caching.js: failed
 kangax-es6/template.tagged.js: failed
-kangax-es6/template.toString.js: failed
+kangax-es6/template.toString.js: OK
 kangax-es6/typed-arrays.ArrayBuffer.Symbol.species.js: failed
 kangax-es6/typed-arrays.DataView.Float32.js: failed
 kangax-es6/typed-arrays.DataView.Float64.js: OK
@@ -1216,10 +1216,10 @@ kangax-es2017/Atomics.store.js: OK
 kangax-es2017/Atomics.sub.js: OK
 kangax-es2017/Atomics.wait.js: OK
 kangax-es2017/Atomics.xor.js: OK
-kangax-es2017/Object.entries.js: failed
+kangax-es2017/Object.entries.js: OK
 kangax-es2017/Object.getOwnPropertyDescriptors.js: failed
 kangax-es2017/Object.getOwnPropertyDescriptors.no-undefined.js: failed
-kangax-es2017/Object.values.js: failed
+kangax-es2017/Object.values.js: OK
 kangax-es2017/SharedArrayBuffer.Symbol.species.js: failed
 kangax-es2017/SharedArrayBuffer.js: OK
 kangax-es2017/SharedArrayBuffer.prototype.Symbol.toStringTag.js: OK
@@ -1292,7 +1292,7 @@ kangax-es2018/regex.unicode-property-escapes.unicode-16.0.js: OK
 kangax-es2018/regex.unicode-property-escapes.unicode-17.0.js: failed
 kangax-es2019/Array.prototype.flatMap.js: OK
 kangax-es2019/Array.prototype.flat-flatMap.unscopables.js: failed
-kangax-es2019/Array.prototype.flat.js: failed
+kangax-es2019/Array.prototype.flat.js: OK
 kangax-es2019/Object.fromEntries.js: failed
 kangax-es2019/String.prototype.trimEnd.js: OK
 kangax-es2019/String.prototype.trimStart.js: OK
