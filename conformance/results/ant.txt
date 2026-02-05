@@ -492,7 +492,7 @@ kangax-es5/strict.this-not-coerced-accessors.js: OK
 kangax-es5/strict.this-not-coerced-methods.js: OK
 kangax-es5/strict.this-undefined.js: OK
 kangax-es5/strict.with-error.js: OK
-kangax-es6/Array.Symbol.species.js: failed
+kangax-es6/Array.Symbol.species.js: OK
 kangax-es6/Array.from.array-like.js: OK
 kangax-es6/Array.from.generator.js: failed
 kangax-es6/Array.from.iterable-instance.js: failed
@@ -575,13 +575,13 @@ kangax-es6/Number.isFinite.js: OK
 kangax-es6/Number.isInteger.js: OK
 kangax-es6/Number.isNaN.js: OK
 kangax-es6/Number.isSafeInteger.js: OK
-kangax-es6/Number.parseFloat.js: failed
-kangax-es6/Number.parseInt.js: failed
+kangax-es6/Number.parseFloat.js: OK
+kangax-es6/Number.parseInt.js: OK
 kangax-es6/Object.assign.js: OK
 kangax-es6/Object.getOwnPropertySymbols.js: OK
-kangax-es6/Object.is.js: failed
+kangax-es6/Object.is.js: OK
 kangax-es6/Object.setPrototypeOf.js: OK
-kangax-es6/Promise.Symbol.species.js: failed
+kangax-es6/Promise.Symbol.species.js: OK
 kangax-es6/Promise.all.iterable.js: failed
 kangax-es6/Promise.all.js: OK
 kangax-es6/Promise.constructor-requires-new.js: OK
@@ -1182,7 +1182,7 @@ kangax-es6/well-known.species.Array.slice.js: failed
 kangax-es6/well-known.species.Array.splice.js: failed
 kangax-es6/well-known.species.Promise.then.js: failed
 kangax-es6/well-known.species.RegExp.split.js: failed
-kangax-es6/well-known.species.js: failed
+kangax-es6/well-known.species.js: OK
 kangax-es6/well-known.split.js: failed
 kangax-es6/well-known.toPrimitive.js: failed
 kangax-es6/well-known.toStringTag.existing-builtins.js: failed
