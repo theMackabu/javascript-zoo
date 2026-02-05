@@ -582,12 +582,12 @@ kangax-es6/Object.getOwnPropertySymbols.js: OK
 kangax-es6/Object.is.js: OK
 kangax-es6/Object.setPrototypeOf.js: OK
 kangax-es6/Promise.Symbol.species.js: OK
-kangax-es6/Promise.all.iterable.js: failed
+kangax-es6/Promise.all.iterable.js: OK
 kangax-es6/Promise.all.js: OK
 kangax-es6/Promise.constructor-requires-new.js: OK
 kangax-es6/Promise.js: OK
 kangax-es6/Promise.prototype-not-instance.js: OK
-kangax-es6/Promise.race.iterable.js: failed
+kangax-es6/Promise.race.iterable.js: OK
 kangax-es6/Promise.race.js: OK
 kangax-es6/Proxy.Array.isArray.js: failed
 kangax-es6/Proxy.JSON.stringify.js: failed
