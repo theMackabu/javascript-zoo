@@ -1069,7 +1069,7 @@ kangax-es6/subclassing.Array.filter.js: failed
 kangax-es6/subclassing.Array.from.js: failed
 kangax-es6/subclassing.Array.isArray.js: OK
 kangax-es6/subclassing.Array.length-access.js: OK
-kangax-es6/subclassing.Array.length-set.js: failed
+kangax-es6/subclassing.Array.length-set.js: OK
 kangax-es6/subclassing.Array.map.js: failed
 kangax-es6/subclassing.Array.of.js: failed
 kangax-es6/subclassing.Array.prototype-chain.js: failed
@@ -1191,7 +1191,7 @@ kangax-es6/well-known.toStringTag.misc-builtins.js: failed
 kangax-es6/well-known.toStringTag.new-builtins.js: failed
 kangax-es6/well-known.unscopables.js: failed
 kangax-es2016/Array.prototype.includes.generic.js: failed
-kangax-es2016/Array.prototype.includes.js: failed
+kangax-es2016/Array.prototype.includes.js: OK
 kangax-es2016/Array.prototype.includes.sparse.js: failed
 kangax-es2016/Array.prototype.includes.typed-array.js: failed
 kangax-es2016/exponentiation.assignment.js: failed
