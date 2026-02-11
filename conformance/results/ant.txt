@@ -494,8 +494,8 @@ kangax-es5/strict.with-error.js: OK
 kangax-es6/Array.Symbol.species.js: OK
 kangax-es6/Array.from.array-like.js: OK
 kangax-es6/Array.from.generator.js: failed
-kangax-es6/Array.from.iterable-instance.js: failed
-kangax-es6/Array.from.iterable.js: failed
+kangax-es6/Array.from.iterable-instance.js: OK
+kangax-es6/Array.from.iterable.js: OK
 kangax-es6/Array.from.iterator-closing.js: failed
 kangax-es6/Array.from.map.array-like.js: failed
 kangax-es6/Array.from.map.generator.js: failed
